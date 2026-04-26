@@ -1,7 +1,9 @@
 {
   "permissions": {
     "allow": [
-      "PowerShell(claude skill *)"
+      "PowerShell(claude skill *)",
+      "WebFetch(domain:www.solidroad.com)",
+      "mcp__Claude_in_Chrome__tabs_context_mcp"
     ]
   }
 }

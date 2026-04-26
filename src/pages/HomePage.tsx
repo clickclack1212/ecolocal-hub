@@ -29,6 +29,7 @@ const features = [
     description:
       'Sfoglia progetti reali nella tua città: orti urbani, repair café, cooperative solari, mercati a rifiuti zero. Filtrate per quartiere e categoria.',
     points: ['Ricerca per zona e categoria', 'Dettagli, contatti e impatto', 'Aggiornate in tempo reale'],
+    tint: 'bg-earth-50 border-earth-100',
     visual: (
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
         <div className="p-4 border-b border-gray-50 flex items-center gap-2">
@@ -61,6 +62,7 @@ const features = [
     description:
       "EcoLocal Hub non è una directory — è una comunità. Trova persone con i tuoi valori, partecipa a eventi locali e misura l'impatto collettivo del tuo quartiere.",
     points: ['Profili e competenze dei volontari', 'Forum e bacheca annunci', 'Tracker impatto comunitario'],
+    tint: 'bg-teal-50 border-teal-100',
     visual: (
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
         <div className="p-5 space-y-4">
@@ -103,6 +105,7 @@ const features = [
     description:
       "Non sai da dove iniziare? L'agente AI analizza le tue domande e suggerisce le iniziative più adatte a te, nella tua zona, con i tuoi obiettivi.",
     points: ['Suggerimenti personalizzati', 'Basato su dati locali reali', 'Integrazione Voiceflow in arrivo'],
+    tint: 'bg-primary-50 border-primary-100',
     visual: (
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
         <div className="p-4 border-b border-gray-50 flex items-center gap-2">
@@ -157,188 +160,268 @@ const valuePropCards = [
   },
 ];
 
+/* ─── Illustrated landscape SVG ─── */
+function HeroLandscape() {
+  const leftTrees = [
+    { x: -10, y: 462, s: 1.05 }, { x: 38, y: 455, s: 1.15 }, { x: 90, y: 463, s: 0.9 },
+    { x: 138, y: 452, s: 1.2 }, { x: 186, y: 460, s: 1.0 }, { x: 232, y: 455, s: 0.88 },
+    { x: 276, y: 463, s: 1.08 }, { x: 316, y: 458, s: 0.92 },
+    { x: 10, y: 482, s: 0.72 }, { x: 58, y: 478, s: 0.78 }, { x: 112, y: 483, s: 0.7 },
+    { x: 162, y: 476, s: 0.75 }, { x: 210, y: 480, s: 0.68 }, { x: 258, y: 477, s: 0.73 },
+  ];
+  const rightTrees = [
+    { x: 1084, y: 458, s: 0.92 }, { x: 1124, y: 462, s: 1.05 }, { x: 1162, y: 455, s: 1.15 },
+    { x: 1210, y: 463, s: 0.9 }, { x: 1258, y: 452, s: 1.2 }, { x: 1302, y: 460, s: 1.0 },
+    { x: 1344, y: 455, s: 0.88 }, { x: 1388, y: 463, s: 1.08 },
+    { x: 1100, y: 480, s: 0.72 }, { x: 1148, y: 476, s: 0.75 }, { x: 1195, y: 482, s: 0.7 },
+    { x: 1245, y: 478, s: 0.73 }, { x: 1292, y: 481, s: 0.68 }, { x: 1342, y: 477, s: 0.72 },
+    { x: 1390, y: 480, s: 0.7 },
+  ];
+  const midTrees = [
+    { x: 348, y: 480, s: 0.6 }, { x: 390, y: 485, s: 0.55 }, { x: 430, y: 480, s: 0.62 },
+    { x: 468, y: 487, s: 0.57 },
+    { x: 932, y: 480, s: 0.6 }, { x: 972, y: 485, s: 0.57 }, { x: 1012, y: 480, s: 0.62 },
+    { x: 1052, y: 487, s: 0.55 },
+  ];
+  const stars = [
+    [85, 48], [230, 28], [415, 62], [660, 32], [880, 54],
+    [970, 38], [1120, 58], [1310, 44], [1370, 72], [520, 45], [740, 28],
+  ];
+
+  const Tree = ({ x, y, s }: { x: number; y: number; s: number }) => (
+    <g transform={`translate(${x},${y}) scale(${s})`}>
+      <rect x="-5" y="0" width="10" height="24" fill="#030c06" />
+      <polygon points="0,-88 -28,0 28,0" fill="#062214" />
+      <polygon points="0,-112 -21,-28 21,-28" fill="#082c1a" />
+      <polygon points="0,-134 -14,-60 14,-60" fill="#0d3a20" />
+    </g>
+  );
+
+  return (
+    <svg
+      className="absolute inset-0 w-full h-full"
+      viewBox="0 0 1400 700"
+      preserveAspectRatio="xMidYMid slice"
+      aria-hidden="true"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <defs>
+        <linearGradient id="g-sky" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#041510" />
+          <stop offset="35%" stopColor="#083522" />
+          <stop offset="65%" stopColor="#0f4025" />
+          <stop offset="85%" stopColor="#195c38" />
+          <stop offset="100%" stopColor="#246845" />
+        </linearGradient>
+        <radialGradient id="g-glow" cx="50%" cy="62%" r="32%">
+          <stop offset="0%" stopColor="#246845" stopOpacity="0.45" />
+          <stop offset="100%" stopColor="#041510" stopOpacity="0" />
+        </radialGradient>
+        <linearGradient id="g-road" x1="0.5" y1="0" x2="0.5" y2="1">
+          <stop offset="0%" stopColor="#c49a18" />
+          <stop offset="100%" stopColor="#7a5e0a" />
+        </linearGradient>
+        <linearGradient id="g-ground" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#0a2e18" />
+          <stop offset="100%" stopColor="#030c06" />
+        </linearGradient>
+      </defs>
+
+      {/* Sky */}
+      <rect width="1400" height="700" fill="url(#g-sky)" />
+      {/* Horizon glow */}
+      <rect width="1400" height="700" fill="url(#g-glow)" />
+
+      {/* Stars */}
+      {stars.map(([x, y], i) => (
+        <circle key={i} cx={x} cy={y} r="1.5" fill="white" opacity="0.4" />
+      ))}
+
+      {/* Far mountains */}
+      <polygon points="0,390 140,245 280,390" fill="#1a6040" opacity="0.5" />
+      <polygon points="180,390 370,210 560,390" fill="#1d6a44" opacity="0.45" />
+      <polygon points="450,390 690,180 930,390" fill="#1a6040" opacity="0.4" />
+      <polygon points="780,390 980,225 1180,390" fill="#1d6a44" opacity="0.45" />
+      <polygon points="1080,390 1260,248 1400,360 1400,390" fill="#1a6040" opacity="0.5" />
+
+      {/* Mid mountains */}
+      <polygon points="-20,470 130,315 280,470" fill="#124a2a" />
+      <polygon points="160,470 370,298 580,470" fill="#155435" />
+      <polygon points="450,470 690,265 930,470" fill="#124a2a" />
+      <polygon points="780,470 975,305 1170,470" fill="#155435" />
+      <polygon points="1060,470 1240,318 1410,430 1410,470" fill="#124a2a" />
+
+      {/* Ground */}
+      <rect x="0" y="458" width="1400" height="242" fill="url(#g-ground)" />
+
+      {/* Winding road */}
+      <path
+        d="M 555,700 Q 618,572 664,528 Q 686,505 700,498 Q 714,505 736,528 Q 782,572 845,700 Z"
+        fill="url(#g-road)"
+      />
+      {/* Road horizon */}
+      <ellipse cx="700" cy="500" rx="10" ry="4" fill="#c49a18" opacity="0.75" />
+
+      {/* Trees */}
+      {leftTrees.map((t, i) => <Tree key={`l${i}`} {...t} />)}
+      {rightTrees.map((t, i) => <Tree key={`r${i}`} {...t} />)}
+      {midTrees.map((t, i) => <Tree key={`m${i}`} {...t} />)}
+
+      {/* Clouds */}
+      <g opacity="0.07">
+        <ellipse cx="160" cy="105" rx="125" ry="40" fill="white" />
+        <ellipse cx="115" cy="112" rx="75" ry="30" fill="white" />
+        <ellipse cx="215" cy="100" rx="85" ry="28" fill="white" />
+      </g>
+      <g opacity="0.05">
+        <ellipse cx="1230" cy="125" rx="110" ry="38" fill="white" />
+        <ellipse cx="1185" cy="132" rx="65" ry="26" fill="white" />
+        <ellipse cx="1280" cy="118" rx="75" ry="25" fill="white" />
+      </g>
+    </svg>
+  );
+}
+
 export default function HomePage() {
   const featured = initiatives.slice(0, 3);
 
   return (
     <>
       {/* ── HERO ── */}
-      <section className="relative overflow-hidden bg-white" aria-label="Hero">
-        {/* Subtle background grid */}
-        <div
-          className="absolute inset-0 pointer-events-none"
-          style={{
-            backgroundImage:
-              'linear-gradient(to right, #f0fdf4 1px, transparent 1px), linear-gradient(to bottom, #f0fdf4 1px, transparent 1px)',
-            backgroundSize: '48px 48px',
-          }}
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-white via-transparent to-white pointer-events-none" />
+      <section className="relative min-h-[88vh] flex items-center overflow-hidden" aria-label="Hero">
+        <HeroLandscape />
 
-        <div className="relative max-w-6xl mx-auto px-5 sm:px-8 pt-20 pb-24 grid lg:grid-cols-2 gap-16 items-center">
-          {/* Left */}
-          <div>
-            <div className="inline-flex items-center gap-2 bg-primary-50 border border-primary-100 text-primary-700 text-xs font-semibold px-3 py-1.5 rounded-full mb-8">
-              <span className="w-1.5 h-1.5 rounded-full bg-primary-500" />
-              Piattaforma di sostenibilità locale · Torino
-            </div>
+        {/* Overlay for text readability */}
+        <div className="absolute inset-0 bg-forest-900/30 pointer-events-none" />
+        {/* Bottom fade to white */}
+        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-white/20 to-transparent pointer-events-none" />
 
-            <h1 className="text-5xl sm:text-6xl font-extrabold text-gray-900 leading-[1.06] tracking-tight mb-6">
-              Agisci localmente.<br />
-              <span className="text-primary-600">Cambia tutto.</span>
-            </h1>
-
-            <p className="text-lg text-gray-500 leading-relaxed mb-10 max-w-lg">
-              Scopri le iniziative di sostenibilità nella tua città. Connettiti
-              con i vicini, riduci la tua impronta ecologica e fai la differenza
-              partendo dal tuo quartiere.
-            </p>
-
-            <div className="flex flex-wrap items-center gap-3">
-              <Link
-                to="/initiatives"
-                className="inline-flex items-center gap-2 bg-primary-600 hover:bg-primary-700 text-white font-semibold text-sm px-5 py-3 rounded-xl transition-colors shadow-sm shadow-primary-200"
-              >
-                Esplora le Iniziative
-                <ArrowRight size={15} strokeWidth={2.5} />
-              </Link>
-              <Link
-                to="/community"
-                className="inline-flex items-center gap-2 text-sm font-semibold text-gray-700 hover:text-gray-900 bg-gray-50 hover:bg-gray-100 px-5 py-3 rounded-xl transition-colors border border-gray-200"
-              >
-                Chi siamo
-              </Link>
-            </div>
-
-            {/* Trust line */}
-            <p className="mt-8 text-xs text-gray-400">
-              Progetto LUMSA · 800+ persone già coinvolte · Torino, Italia
-            </p>
+        <div className="relative max-w-4xl mx-auto px-5 sm:px-8 py-24 text-center w-full">
+          {/* Badge */}
+          <div className="inline-flex items-center gap-2 bg-white/15 backdrop-blur-sm border border-white/20 text-white text-xs font-semibold px-4 py-1.5 rounded-full mb-8">
+            <span className="w-1.5 h-1.5 rounded-full bg-green-400" />
+            Piattaforma di sostenibilità locale · Torino
           </div>
 
-          {/* Right — product mockup */}
-          <div className="relative lg:pl-4" aria-hidden="true">
-            <div className="absolute -inset-4 bg-primary-50/60 rounded-3xl blur-2xl" />
-            <div className="relative rounded-2xl border border-gray-200 bg-white shadow-xl overflow-hidden">
-              {/* Browser chrome */}
-              <div className="flex items-center gap-1.5 px-4 py-3 bg-gray-50 border-b border-gray-100">
-                <div className="w-3 h-3 rounded-full bg-red-300" />
-                <div className="w-3 h-3 rounded-full bg-yellow-300" />
-                <div className="w-3 h-3 rounded-full bg-green-300" />
-                <div className="mx-auto text-[11px] text-gray-400 bg-white border border-gray-200 px-4 py-1 rounded-md">
-                  ecolocal.hub/initiatives
-                </div>
-              </div>
-              {/* Content */}
-              <div className="p-5 space-y-3">
-                <div className="flex items-center justify-between">
-                  <div className="text-sm font-semibold text-gray-900">6 iniziative trovate</div>
-                  <div className="flex gap-1.5">
-                    {['Tutte', 'Riciclo', 'Cibo'].map((f, i) => (
-                      <span
-                        key={f}
-                        className={`text-[10px] font-medium px-2.5 py-1 rounded-full border ${
-                          i === 0
-                            ? 'bg-primary-600 text-white border-primary-600'
-                            : 'text-gray-500 border-gray-200 bg-white'
-                        }`}
-                      >
-                        {f}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-2.5">
-                  {[
-                    { title: 'Orto Comunitario', cat: 'Cibo Locale', img: 'bg-green-100', emoji: '🌱' },
-                    { title: 'GreenWheels', cat: 'Trasporti', img: 'bg-teal-100', emoji: '🚲' },
-                    { title: 'Rifiuti Zero', cat: 'Riciclo', img: 'bg-blue-100', emoji: '♻️' },
-                    { title: 'SolarShare', cat: 'Energia', img: 'bg-yellow-100', emoji: '⚡' },
-                  ].map((c) => (
-                    <div key={c.title} className="bg-white border border-gray-100 rounded-xl overflow-hidden shadow-sm">
-                      <div className={`h-16 ${c.img} flex items-center justify-center text-2xl`}>
-                        {c.emoji}
-                      </div>
-                      <div className="p-2.5">
-                        <div className="text-[11px] font-semibold text-gray-800">{c.title}</div>
-                        <div className="text-[9px] text-gray-400 mt-0.5">{c.cat}</div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
+          {/* Heading */}
+          <h1 className="text-5xl sm:text-6xl lg:text-7xl font-extrabold text-white leading-[1.05] tracking-tight mb-6">
+            Agisci localmente.<br />
+            <span className="text-green-300">Cambia tutto.</span>
+          </h1>
+
+          {/* Subtitle */}
+          <p className="text-lg sm:text-xl text-white/75 leading-relaxed mb-10 max-w-2xl mx-auto">
+            Scopri le iniziative di sostenibilità nella tua città. Connettiti
+            con i vicini e fai la differenza partendo dal tuo quartiere.
+          </p>
+
+          {/* CTAs */}
+          <div className="flex flex-wrap justify-center gap-3">
+            <Link
+              to="/initiatives"
+              className="inline-flex items-center gap-2 bg-primary-500 hover:bg-primary-400 text-white font-bold px-8 py-4 rounded-full shadow-lg transition-all duration-200 hover:shadow-xl hover:-translate-y-0.5"
+            >
+              Esplora le Iniziative
+              <ArrowRight size={16} strokeWidth={2.5} />
+            </Link>
+            <Link
+              to="/contact"
+              className="inline-flex items-center gap-2 bg-gold-400 hover:bg-gold-300 text-gray-900 font-bold px-8 py-4 rounded-full shadow-lg transition-all duration-200 hover:shadow-xl hover:-translate-y-0.5"
+            >
+              Partecipa Oggi
+              <ArrowRight size={16} strokeWidth={2.5} />
+            </Link>
           </div>
+
+          {/* Trust line */}
+          <p className="mt-10 text-sm text-white/50">
+            Progetto LUMSA · 800+ persone già coinvolte · Torino, Italia
+          </p>
         </div>
       </section>
 
       {/* ── STATS BAR ── */}
-      <section className="border-y border-gray-100 bg-gray-50/60" aria-label="Statistiche di impatto">
-        <div className="max-w-6xl mx-auto px-5 sm:px-8 py-10 grid grid-cols-2 sm:grid-cols-4 gap-8">
+      <section className="border-y border-gray-100 bg-cream-50" aria-label="Statistiche di impatto">
+        <div className="max-w-5xl mx-auto px-5 sm:px-8 py-12 grid grid-cols-2 sm:grid-cols-4 gap-8">
           {stats.map((s) => (
             <div key={s.label} className="text-center">
-              <div className="text-3xl sm:text-4xl font-extrabold metric-num">{s.value}</div>
-              <div className="text-sm text-gray-500 mt-1.5">{s.label}</div>
+              <div className="text-4xl sm:text-5xl font-extrabold metric-num">{s.value}</div>
+              <div className="text-sm text-gray-500 mt-2 font-medium">{s.label}</div>
             </div>
           ))}
         </div>
       </section>
 
-      {/* ── FEATURE BLOCKS ── */}
-      <section aria-label="Funzionalità principali">
-        {features.map((feat, idx) => (
-          <div
-            key={feat.label}
-            className={`py-20 sm:py-24 ${idx % 2 === 1 ? 'bg-gray-50/60' : 'bg-white'}`}
-          >
-            <div
-              className={`max-w-6xl mx-auto px-5 sm:px-8 grid lg:grid-cols-2 gap-16 items-center ${
-                idx % 2 === 1 ? 'lg:[&>*:first-child]:order-2' : ''
-              }`}
-            >
-              {/* Text */}
-              <div>
-                <span className="inline-flex items-center text-xs font-semibold text-primary-600 bg-primary-50 border border-primary-100 px-3 py-1.5 rounded-full mb-6">
+      {/* ── FEATURE SECTION HEADING ── */}
+      <section className="pt-24 pb-6 bg-white" aria-label="Funzionalità principali">
+        <div className="max-w-5xl mx-auto px-5 sm:px-8 text-center">
+          <span className="text-xs font-semibold uppercase tracking-widest text-primary-600">
+            Come funziona
+          </span>
+          <h2 className="text-4xl sm:text-5xl font-extrabold text-gray-900 mt-3 mb-5 tracking-tight leading-[1.1]">
+            Dalla scoperta all'azione,<br className="hidden sm:block" /> in un'unica piattaforma.
+          </h2>
+          <p className="text-gray-500 text-lg max-w-2xl mx-auto leading-relaxed">
+            Trova iniziative reali, connettiti con la tua comunità e misura il tuo impatto — tutto in un posto.
+          </p>
+        </div>
+      </section>
+
+      {/* ── 3-COLUMN FEATURE CARDS (Solidroad style) ── */}
+      <section className="pb-24 bg-white" aria-label="Funzionalità">
+        <div className="max-w-5xl mx-auto px-5 sm:px-8">
+          <div className="grid lg:grid-cols-3 gap-5 mt-12">
+            {features.map((feat) => (
+              <div
+                key={feat.label}
+                className={`rounded-3xl border p-6 overflow-hidden flex flex-col ${feat.tint}`}
+              >
+                {/* UI visual mockup */}
+                <div className="mb-6 rounded-2xl overflow-hidden shadow-md">
+                  {feat.visual}
+                </div>
+
+                {/* Label pill */}
+                <span className="inline-flex self-start items-center text-xs font-semibold text-primary-700 bg-primary-100 px-3 py-1 rounded-full mb-3">
                   {feat.label}
                 </span>
-                <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900 tracking-tight leading-tight mb-5">
+
+                {/* Text */}
+                <h3 className="text-xl font-extrabold text-gray-900 mb-3 leading-snug">
                   {feat.title}
-                </h2>
-                <p className="text-gray-500 text-lg leading-relaxed mb-8">
+                </h3>
+                <p className="text-sm text-gray-600 leading-relaxed flex-1">
                   {feat.description}
                 </p>
-                <ul className="space-y-2.5 mb-10">
+
+                {/* Points */}
+                <ul className="mt-4 space-y-2">
                   {feat.points.map((pt) => (
-                    <li key={pt} className="flex items-center gap-3 text-sm text-gray-700">
-                      <div className="w-5 h-5 rounded-full bg-primary-100 flex items-center justify-center shrink-0">
-                        <Check size={11} className="text-primary-600" strokeWidth={3} />
+                    <li key={pt} className="flex items-center gap-2.5 text-xs text-gray-700">
+                      <div className="w-4 h-4 rounded-full bg-primary-100 flex items-center justify-center shrink-0">
+                        <Check size={9} className="text-primary-600" strokeWidth={3} />
                       </div>
                       {pt}
                     </li>
                   ))}
                 </ul>
+
                 <Link
                   to="/initiatives"
-                  className="inline-flex items-center gap-2 text-sm font-semibold text-primary-600 hover:text-primary-700 transition-colors"
+                  className="mt-5 inline-flex items-center gap-1.5 text-sm font-bold text-gray-900 hover:text-primary-700 transition-colors"
                 >
                   Scopri di più
                   <ArrowRight size={14} strokeWidth={2.5} />
                 </Link>
               </div>
-
-              {/* Visual */}
-              <div className="relative">
-                <div className="absolute -inset-4 bg-primary-50/40 rounded-3xl blur-xl" />
-                <div className="relative">{feat.visual}</div>
-              </div>
-            </div>
+            ))}
           </div>
-        ))}
+        </div>
       </section>
 
       {/* ── VALUE PROPS GRID ── */}
-      <section className="py-20 sm:py-24 bg-white border-t border-gray-100" aria-label="Perché EcoLocal Hub">
-        <div className="max-w-6xl mx-auto px-5 sm:px-8">
+      <section className="py-24 bg-cream-50 border-t border-gray-100" aria-label="Perché EcoLocal Hub">
+        <div className="max-w-5xl mx-auto px-5 sm:px-8">
           <div className="text-center mb-14">
             <span className="text-xs font-semibold uppercase tracking-widest text-primary-600">
               Perché noi
@@ -351,18 +434,18 @@ export default function HomePage() {
             </p>
           </div>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {valuePropCards.map((card) => {
               const Icon = card.icon;
               return (
                 <div
                   key={card.title}
-                  className="p-6 rounded-2xl border border-gray-100 bg-gray-50/60 hover:bg-white hover:border-gray-200 hover:shadow-sm transition-all duration-200"
+                  className="p-6 rounded-2xl border border-gray-200 bg-white hover:shadow-md transition-all duration-200"
                 >
                   <div className="w-10 h-10 rounded-xl bg-primary-100 flex items-center justify-center mb-4">
                     <Icon size={18} className="text-primary-600" strokeWidth={1.75} />
                   </div>
-                  <h3 className="text-sm font-semibold text-gray-900 mb-2">{card.title}</h3>
+                  <h3 className="text-sm font-bold text-gray-900 mb-2">{card.title}</h3>
                   <p className="text-sm text-gray-500 leading-relaxed">{card.desc}</p>
                 </div>
               );
@@ -372,8 +455,8 @@ export default function HomePage() {
       </section>
 
       {/* ── CATEGORIES ── */}
-      <section className="py-20 sm:py-24 bg-gray-50/60 border-t border-gray-100" aria-label="Categorie">
-        <div className="max-w-6xl mx-auto px-5 sm:px-8">
+      <section className="py-24 bg-white border-t border-gray-100" aria-label="Categorie">
+        <div className="max-w-5xl mx-auto px-5 sm:px-8">
           <div className="text-center mb-12">
             <span className="text-xs font-semibold uppercase tracking-widest text-primary-600">
               Categorie
@@ -406,8 +489,8 @@ export default function HomePage() {
       </section>
 
       {/* ── FEATURED INITIATIVES ── */}
-      <section className="py-20 sm:py-24 bg-white border-t border-gray-100" aria-label="Iniziative in evidenza">
-        <div className="max-w-6xl mx-auto px-5 sm:px-8">
+      <section className="py-24 bg-cream-50 border-t border-gray-100" aria-label="Iniziative in evidenza">
+        <div className="max-w-5xl mx-auto px-5 sm:px-8">
           <div className="flex items-end justify-between mb-12">
             <div>
               <span className="text-xs font-semibold uppercase tracking-widest text-primary-600">
@@ -419,7 +502,7 @@ export default function HomePage() {
             </div>
             <Link
               to="/initiatives"
-              className="hidden sm:inline-flex items-center gap-1.5 text-sm font-semibold text-gray-600 hover:text-gray-900 transition-colors"
+              className="hidden sm:inline-flex items-center gap-1.5 text-sm font-bold text-gray-700 hover:text-gray-900 transition-colors"
             >
               Vedi tutte
               <ArrowRight size={14} strokeWidth={2.5} />
@@ -435,7 +518,7 @@ export default function HomePage() {
           <div className="text-center mt-10 sm:hidden">
             <Link
               to="/initiatives"
-              className="inline-flex items-center gap-2 text-sm font-semibold text-primary-600"
+              className="inline-flex items-center gap-2 text-sm font-bold text-primary-600"
             >
               Vedi tutte le iniziative
               <ArrowRight size={14} strokeWidth={2.5} />
@@ -444,41 +527,93 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── SCIENCE / QUOTE SECTION ── */}
-      <section className="py-20 sm:py-24 bg-gray-50/60 border-t border-gray-100" aria-label="Dati scientifici">
-        <div className="max-w-4xl mx-auto px-5 sm:px-8 text-center">
-          <span className="text-xs font-semibold uppercase tracking-widest text-primary-600">
-            La scienza lo conferma
-          </span>
-          <blockquote className="mt-8 mb-10">
-            <p className="text-2xl sm:text-3xl font-bold text-gray-900 leading-snug tracking-tight">
-              "Le iniziative ambientali basate sulla comunità generano fino a{' '}
-              <span className="text-primary-600">3 volte più cambiamento comportamentale</span>{' '}
-              rispetto alle campagne istituzionali."
-            </p>
-          </blockquote>
-          <div className="flex justify-center gap-12 sm:gap-20">
-            {[
-              { stat: '70%', desc: 'emissioni influenzate da scelte locali' },
-              { stat: '3×', desc: 'più efficace del top-down' },
-              { stat: '12k€', desc: 'valore economico locale per iniziativa' },
-            ].map((s) => (
-              <div key={s.stat}>
-                <div className="text-3xl sm:text-4xl font-extrabold metric-num">{s.stat}</div>
-                <div className="text-xs text-gray-500 mt-1.5 max-w-[100px] leading-tight">{s.desc}</div>
+      {/* ── TESTIMONIAL / QUOTE SECTION (Solidroad style) ── */}
+      <section className="py-24 bg-mint-50 border-t border-gray-100" aria-label="Dati scientifici">
+        <div className="max-w-5xl mx-auto px-5 sm:px-8">
+          <div className="grid lg:grid-cols-2 gap-16 items-center">
+
+            {/* Left: illustrated nature image */}
+            <div className="relative">
+              <div className="absolute -inset-3 bg-primary-100/40 rounded-3xl blur-xl pointer-events-none" />
+              <div className="relative rounded-3xl overflow-hidden shadow-xl aspect-[4/3]">
+                <img
+                  src="https://images.unsplash.com/photo-1470058869958-2a77ade41c02?w=700&q=80"
+                  alt="Sentiero in un bosco verde"
+                  className="w-full h-full object-cover"
+                  loading="lazy"
+                />
+                {/* Green tint overlay to make it look more illustrated */}
+                <div className="absolute inset-0 bg-primary-900/20 mix-blend-multiply" />
+                {/* Metric badge overlay */}
+                <div className="absolute bottom-5 left-5 right-5 bg-white/90 backdrop-blur-sm rounded-2xl p-4 flex gap-6">
+                  {[
+                    { stat: '70%', desc: 'emissioni influenzate da scelte locali' },
+                    { stat: '3×', desc: 'più efficace del top-down' },
+                    { stat: '12k€', desc: 'valore economico per iniziativa' },
+                  ].map((s) => (
+                    <div key={s.stat} className="text-center flex-1">
+                      <div className="text-xl font-extrabold metric-num">{s.stat}</div>
+                      <div className="text-[10px] text-gray-500 mt-0.5 leading-tight">{s.desc}</div>
+                    </div>
+                  ))}
+                </div>
               </div>
-            ))}
+            </div>
+
+            {/* Right: quote + attribution */}
+            <div>
+              <span className="text-xs font-semibold uppercase tracking-widest text-primary-600">
+                La scienza lo conferma
+              </span>
+              <blockquote className="mt-6 mb-8">
+                <p className="text-2xl sm:text-3xl font-extrabold text-gray-900 leading-snug tracking-tight">
+                  "Le iniziative ambientali basate sulla comunità generano fino a{' '}
+                  <span className="text-primary-600">3 volte più cambiamento comportamentale</span>{' '}
+                  rispetto alle campagne istituzionali."
+                </p>
+              </blockquote>
+
+              <div className="flex items-center gap-3 mb-8">
+                <div className="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center">
+                  <Leaf size={16} className="text-primary-600" />
+                </div>
+                <div>
+                  <div className="text-sm font-semibold text-gray-900">Ricerca IPCC · 2023</div>
+                  <div className="text-xs text-gray-500">Iniziative ambientali comunitarie</div>
+                </div>
+              </div>
+
+              <Link
+                to="/initiatives"
+                className="inline-flex items-center gap-2 bg-gold-400 hover:bg-gold-300 text-gray-900 font-bold px-7 py-3.5 rounded-full shadow-md transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg"
+              >
+                Esplora le Iniziative
+                <ArrowRight size={15} strokeWidth={2.5} />
+              </Link>
+            </div>
           </div>
         </div>
       </section>
 
       {/* ── FINAL CTA ── */}
-      <section className="py-24 bg-gray-900 text-white" aria-label="Call to action finale">
-        <div className="max-w-3xl mx-auto px-5 sm:px-8 text-center">
+      <section className="py-28 bg-forest-800 text-white relative overflow-hidden" aria-label="Call to action finale">
+        {/* Background texture */}
+        <div
+          className="absolute inset-0 pointer-events-none opacity-5"
+          style={{
+            backgroundImage:
+              'linear-gradient(to right, #ffffff 1px, transparent 1px), linear-gradient(to bottom, #ffffff 1px, transparent 1px)',
+            backgroundSize: '48px 48px',
+          }}
+        />
+        {/* Glow */}
+        <div className="absolute inset-0 bg-gradient-to-br from-primary-900/40 via-transparent to-primary-800/20 pointer-events-none" />
+
+        <div className="relative max-w-3xl mx-auto px-5 sm:px-8 text-center">
           <h2 className="text-4xl sm:text-5xl font-extrabold mb-6 tracking-tight leading-tight">
             Pronto a fare la<br />differenza?
           </h2>
-          <p className="text-gray-400 text-lg mb-10 leading-relaxed max-w-xl mx-auto">
+          <p className="text-white/60 text-lg mb-10 leading-relaxed max-w-xl mx-auto">
             Unisciti alle centinaia di persone che già agiscono.
             Iscriviti per ricevere aggiornamenti sulle nuove iniziative
             nella tua zona.
@@ -486,14 +621,14 @@ export default function HomePage() {
           <div className="flex flex-wrap justify-center gap-4">
             <Link
               to="/contact"
-              className="inline-flex items-center gap-2 bg-primary-500 hover:bg-primary-400 text-white font-semibold px-6 py-3.5 rounded-xl transition-colors"
+              className="inline-flex items-center gap-2 bg-gold-400 hover:bg-gold-300 text-gray-900 font-bold px-8 py-4 rounded-full shadow-lg transition-all duration-200 hover:-translate-y-0.5 hover:shadow-xl"
             >
               Partecipa Oggi
               <ArrowRight size={15} strokeWidth={2.5} />
             </Link>
             <Link
               to="/initiatives"
-              className="inline-flex items-center gap-2 text-gray-300 hover:text-white font-semibold px-6 py-3.5 rounded-xl border border-white/10 hover:border-white/20 transition-colors"
+              className="inline-flex items-center gap-2 text-white font-bold px-8 py-4 rounded-full border border-white/20 hover:border-white/40 hover:bg-white/10 transition-all duration-200"
             >
               Esplora le Iniziative
             </Link>
