@@ -1,39 +1,44 @@
 import { Link } from 'react-router-dom';
-import { Mail } from 'lucide-react';
+import { Leaf, Mail } from 'lucide-react';
+
+const navLinks = [
+  { to: '/initiatives', label: 'Iniziative' },
+  { to: '/community', label: 'Comunità' },
+  { to: '/eco-assistant', label: 'Eco Assistente' },
+  { to: '/contact', label: 'Partecipa' },
+];
 
 export default function Footer() {
   return (
-    <footer className="bg-gray-900 text-gray-400 mt-auto">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-12">
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
+    <footer className="bg-gray-950 text-gray-400 mt-auto">
+      <div className="max-w-6xl mx-auto px-5 sm:px-8 pt-16 pb-10">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-10 pb-12 border-b border-white/5">
           {/* Brand */}
-          <div>
-            <div className="flex items-center gap-2 text-white font-bold text-lg mb-3">
-              <img src="/logo.png" alt="EcoLocal Hub" className="h-8 w-auto" />
-              EcoLocal Hub
+          <div className="sm:col-span-1">
+            <div className="flex items-center gap-2 mb-4">
+              <div className="w-8 h-8 rounded-lg bg-primary-600 flex items-center justify-center shrink-0">
+                <Leaf size={15} className="text-white" strokeWidth={2} />
+              </div>
+              <span className="text-white font-semibold text-sm tracking-tight">EcoLocal Hub</span>
             </div>
-            <p className="text-sm leading-relaxed">
+            <p className="text-sm leading-relaxed max-w-xs">
               Connettere le comunità con le iniziative di sostenibilità locale.
               Insieme costruiamo un futuro più verde.
             </p>
+            <p className="text-xs text-gray-600 mt-4">Progetto LUMSA · Torino, Italia</p>
           </div>
 
-          {/* Link */}
+          {/* Esplora */}
           <div>
-            <h3 className="text-white font-semibold mb-3 text-sm uppercase tracking-wide">
+            <h3 className="text-white text-xs font-semibold uppercase tracking-widest mb-5">
               Esplora
             </h3>
-            <ul className="flex flex-col gap-2 text-sm list-none m-0 p-0">
-              {[
-                { to: '/initiatives', label: 'Iniziative' },
-                { to: '/community', label: 'Comunità' },
-                { to: '/eco-assistant', label: 'Eco Assistente' },
-                { to: '/contact', label: 'Partecipa' },
-              ].map((l) => (
+            <ul className="flex flex-col gap-3 list-none m-0 p-0">
+              {navLinks.map((l) => (
                 <li key={l.to}>
                   <Link
                     to={l.to}
-                    className="hover:text-primary-400 transition-colors"
+                    className="text-sm hover:text-white transition-colors duration-150"
                   >
                     {l.label}
                   </Link>
@@ -44,25 +49,25 @@ export default function Footer() {
 
           {/* Contatti */}
           <div>
-            <h3 className="text-white font-semibold mb-3 text-sm uppercase tracking-wide">
+            <h3 className="text-white text-xs font-semibold uppercase tracking-widest mb-5">
               Contatti
             </h3>
-            <ul className="flex flex-col gap-2 text-sm list-none m-0 p-0">
+            <ul className="flex flex-col gap-3 list-none m-0 p-0">
               <li>
                 <a
                   href="mailto:g.capuana@lumsastud.it"
-                  className="flex items-center gap-2 hover:text-primary-400 transition-colors"
+                  className="flex items-center gap-2 text-sm hover:text-white transition-colors"
                 >
-                  <Mail size={14} aria-hidden="true" />
+                  <Mail size={13} aria-hidden="true" />
                   g.capuana@lumsastud.it
                 </a>
               </li>
               <li>
                 <a
                   href="mailto:s.digaudio@lumsastud.it"
-                  className="flex items-center gap-2 hover:text-primary-400 transition-colors"
+                  className="flex items-center gap-2 text-sm hover:text-white transition-colors"
                 >
-                  <Mail size={14} aria-hidden="true" />
+                  <Mail size={13} aria-hidden="true" />
                   s.digaudio@lumsastud.it
                 </a>
               </li>
@@ -70,8 +75,10 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="border-t border-gray-800 mt-10 pt-6 text-center text-xs text-gray-600">
-          © 2026 EcoLocal Hub — Lumsa Project
+        {/* Bottom bar */}
+        <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-gray-600">
+          <span>© 2026 EcoLocal Hub — Progetto universitario LUMSA</span>
+          <span>Fatto con 🌿 a Torino</span>
         </div>
       </div>
     </footer>
