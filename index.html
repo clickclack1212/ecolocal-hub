@@ -7,27 +7,27 @@
     <meta name="description" content="EcoLocal Hub — Discover and join local sustainability initiatives in your city." />
     <title>EcoLocal Hub — Local Sustainability Platform</title>
 
-    <!--
-      VOICEFLOW CHATBOT SCRIPT
-      ─────────────────────────
-      Uncomment and replace YOUR_PROJECT_ID to activate the Voiceflow chatbot:
-
-      <script type="text/javascript">
-        (function(d, t) {
-          var v = d.createElement(t), s = d.getElementsByTagName(t)[0];
-          v.onload = function() {
-            window.voiceflow.chat.load({
-              verify: { projectID: 'YOUR_PROJECT_ID' },
-              url: 'https://general-runtime.voiceflow.com',
-              versionID: 'production'
-            });
-          }
-          v.src = "https://cdn.voiceflow.com/widget/bundle.mjs";
-          v.type = "text/javascript";
-          s.parentNode.insertBefore(v, s);
-        })(document, 'script');
-      </script>
-    -->
+    <!-- VOICEFLOW WIDGET — ECO ASSISTENTE -->
+    <script type="text/javascript">
+      (function(d, t) {
+        var v = d.createElement(t), s = d.getElementsByTagName(t)[0];
+        v.onload = function() {
+          window.voiceflow.chat.load({
+            verify: { projectID: '69ef595aa11bd47e12fe8f37' },
+            url: 'https://general-runtime.voiceflow.com',
+            versionID: 'production',
+            assistant: {
+              title: 'Eco Assistente',
+              description: 'Sostenibilità · Palermo',
+              color: '#16a34a'
+            }
+          });
+        };
+        v.src = "https://cdn.voiceflow.com/widget-next/bundle.mjs";
+        v.type = "text/javascript";
+        s.parentNode.insertBefore(v, s);
+      })(document, 'script');
+    </script>
 
     <!-- TALLY.SO EMBED SCRIPT -->
     <script async src="https://tally.so/widgets/embed.js"></script>

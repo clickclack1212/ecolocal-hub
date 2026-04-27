@@ -11,8 +11,8 @@ export default function Layout() {
         <Outlet />
       </main>
       <Footer />
-      {/* Voiceflow floating chatbot button — always visible */}
-      <ChatbotButton />
+      {/* ChatbotButton disabilitato — widget Voiceflow reale attivo tramite index.html */}
+      {/* <ChatbotButton /> */}
     </div>
   );
 }
