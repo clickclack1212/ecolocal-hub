@@ -1,12 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { Sparkles, Send, Leaf, Zap, Recycle, Bike, ArrowRight } from 'lucide-react';
 
-/*
- * ECO ASSISTENTE — Concept page.
- * getMockResponse() simulates AI responses.
- * Replace with a real API call (Voiceflow / OpenAI / Gemini) for production.
- */
-
 interface Message {
   role: 'user' | 'assistant';
   text: string;
@@ -19,50 +13,70 @@ const suggestions = [
   { icon: Zap, text: "Dimmi dell'energia solare comunitaria." },
 ];
 
-function getMockResponse(input: string): string {
-  const q = input.toLowerCase();
-  if (q.includes('spreco') || q.includes('rifiut') || q.includes('waste'))
-    return '🌿 Ottima domanda! Per ridurre gli sprechi alimentari: pianifica i pasti settimanalmente, conserva correttamente i prodotti, fai il compostaggio. Controlla anche il Mercato a Rifiuti Zero in Piazza Politeama ogni primo sabato del mese!';
-  if (q.includes('solare') || q.includes('energia') || q.includes('solar'))
-    return "⚡ La Cooperativa SolarShare al Quartiere Noce permette a inquilini e proprietari di investire nel solare condiviso. Evitano 45 tonnellate di CO₂ all'anno!";
-  if (q.includes('bici') || q.includes('trasport') || q.includes('mobilit'))
-    return '🚲 La Rete GreenWheels conta 200 bici su 15 stazioni in città. Sostituisce 1.200 tragitti in auto al mese. La tessera annuale è conveniente!';
-  if (q.includes('orto') || q.includes('cibo') || q.includes('semi') || q.includes('garden'))
-    return "🥕 L'Orto Comunitario (2.000 mq, 80+ appezzamenti) al Quartiere Zisa e la Biblioteca dei Semi alla Biblioteca Comunale sono perfetti per te!";
-  if (q.includes('ciao') || q.includes('salve') || q.includes('buon'))
-    return '👋 Ciao! Sono l\'Eco Assistente. Chiedimi qualsiasi cosa sulle iniziative di sostenibilità locali!';
-  return `🌍 Grazie per la tua domanda su "${input}". Sfoglia la pagina Iniziative per dettagli aggiornati. Presto sarà integrata un'AI reale tramite Voiceflow!`;
+// Voiceflow API integration
+const VF_API_KEY = 'VF.DM.69ef5ba0003c5c7a49123aa5.2bCHkWDztM6iLEo1';
+const VF_PROJECT_ID = '69ef595aa11bd47e12fe8f37';
+
+async function getVoiceflowResponse(userMessage: string, sessionId: string): Promise<string> {
+  try {
+    const res = await fetch(
+      `https://general-runtime.voiceflow.com/state/user/${sessionId}/interact`,
+      {
+        method: 'POST',
+        headers: {
+          'Authorization': VF_API_KEY,
+          'Content-Type': 'application/json',
+          'versionID': 'production',
+          'projectID': VF_PROJECT_ID,
+        },
+        body: JSON.stringify({
+          action: { type: 'text', payload: userMessage },
+          config: { tts: false, stripSSML: true },
+        }),
+      }
+    );
+    if (!res.ok) throw new Error('Errore API');
+    const traces = await res.json();
+    const testo = (Array.isArray(traces) ? traces : [])
+      .filter((t: { type: string }) => t.type === 'speak' || t.type === 'text')
+      .map((t: { payload?: { message?: string } }) => t.payload?.message ?? '')
+      .join(' ')
+      .trim();
+    return testo || '🌍 Non ho trovato una risposta specifica. Visita la pagina Iniziative per esplorare i progetti attivi a Palermo!';
+  } catch {
+    return '⚠️ Connessione temporaneamente non disponibile. Riprova tra qualche secondo!';
+  }
 }
 
 const howItWorks = [
   { step: '1', title: "L'utente pone una domanda", desc: 'Scrivi qualsiasi cosa sulla sostenibilità locale o su come vivere in modo più verde.' },
   { step: '2', title: "L'AI elabora il contesto", desc: "L'agente analizza la richiesta e la abbina ai dati delle iniziative locali e alle conoscenze ambientali." },
   { step: '3', title: 'Suggerimenti personalizzati', desc: "L'assistente restituisce consigli concreti: iniziative vicine, risorse e prossimi passi." },
-  { step: '4', title: 'Futuro: basato sulla posizione', desc: "Con il consenso, l'agente suggerirà azioni iper-locali basate sulla tua posizione GPS." },
+  { step: '4', title: 'Basato su dati reali', desc: "L'agente conosce le 6 iniziative attive a Palermo e le risponde con orari, luoghi e contatti aggiornati." },
 ];
 
 export default function EcoAssistantPage() {
   const [messages, setMessages] = useState<Message[]>([
-    { role: 'assistant', text: "🌿 Ciao! Sono l'Eco Assistente. Chiedimi delle iniziative di sostenibilità locali, come vivere in modo più verde o come partecipare alla tua comunità!" },
+    { role: 'assistant', text: "🌿 Ciao! Sono l'Eco Assistente di EcoLocal Hub. Chiedimi delle iniziative di sostenibilità locali, come vivere in modo più verde o come partecipare alla tua comunità a Palermo!" },
   ]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
+  const sessionIdRef = useRef<string>(Math.random().toString(36).slice(2));
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, loading]);
 
-  function handleSend(text?: string) {
+  async function handleSend(text?: string) {
     const msg = (text ?? input).trim();
-    if (!msg) return;
+    if (!msg || loading) return;
     setMessages((prev) => [...prev, { role: 'user', text: msg }]);
     setInput('');
     setLoading(true);
-    setTimeout(() => {
-      setMessages((prev) => [...prev, { role: 'assistant', text: getMockResponse(msg) }]);
-      setLoading(false);
-    }, 800);
+    const reply = await getVoiceflowResponse(msg, sessionIdRef.current);
+    setMessages((prev) => [...prev, { role: 'assistant', text: reply }]);
+    setLoading(false);
   }
 
   function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
@@ -76,14 +90,14 @@ export default function EcoAssistantPage() {
         <div className="max-w-6xl mx-auto px-5 sm:px-8 pt-14 pb-12">
           <div className="flex items-center gap-2 text-xs font-semibold text-primary-600 mb-4">
             <Sparkles size={14} aria-hidden="true" />
-            <span className="uppercase tracking-widest">Concetto AI</span>
+            <span className="uppercase tracking-widest">AI Integrata</span>
           </div>
           <h1 className="text-4xl sm:text-5xl font-extrabold text-gray-900 tracking-tight mb-4 leading-tight">
             Eco Assistente.
           </h1>
           <p className="text-gray-500 text-lg leading-relaxed max-w-2xl">
             Un agente AI che suggerisce azioni di sostenibilità locali in base alle tue
-            domande. Modalità demo — integrazione Voiceflow in arrivo.
+            domande. Alimentato da Voiceflow con dati reali sulle iniziative di Palermo.
           </p>
         </div>
       </section>
@@ -108,8 +122,8 @@ export default function EcoAssistantPage() {
               <div>
                 <div className="text-sm font-semibold text-gray-900">Eco Assistente</div>
                 <div className="flex items-center gap-1.5 text-xs text-primary-600">
-                  <div className="w-1.5 h-1.5 rounded-full bg-primary-500" />
-                  Online · Demo
+                  <div className="w-1.5 h-1.5 rounded-full bg-primary-500 animate-pulse" />
+                  Online · Voiceflow AI
                 </div>
               </div>
             </div>
@@ -192,7 +206,7 @@ export default function EcoAssistantPage() {
               Come funziona
             </span>
             <h2 className="text-xl font-extrabold text-gray-900 mt-2 mb-6 tracking-tight">
-              Concept AI Agent
+              AI Agent — Voiceflow
             </h2>
             <div className="flex flex-col gap-5">
               {howItWorks.map((s) => (
@@ -210,13 +224,13 @@ export default function EcoAssistantPage() {
           </div>
 
           {/* Tech note */}
-          <div className="bg-gray-50 border border-gray-200 rounded-xl p-5 text-xs text-gray-500 leading-relaxed">
-            <strong className="text-gray-700 block mb-1.5">Nota tecnica</strong>
-            Questa demo usa risposte simulate. Per la produzione, integra{' '}
-            <span className="text-primary-600 font-medium">Voiceflow</span>,{' '}
-            <span className="text-primary-600 font-medium">OpenAI API</span> o{' '}
-            <span className="text-primary-600 font-medium">Google Gemini</span>{' '}
-            sostituendo <code className="bg-gray-200 px-1 rounded">getMockResponse()</code>.
+          <div className="bg-primary-50 border border-primary-100 rounded-xl p-5 text-xs text-gray-600 leading-relaxed">
+            <strong className="text-primary-700 block mb-1.5">Powered by Voiceflow</strong>
+            Questo assistente è collegato a un agente{' '}
+            <span className="text-primary-600 font-medium">Voiceflow</span>{' '}
+            reale, con Knowledge Base sulle iniziative di Palermo, Playbooks tematici
+            e modello{' '}
+            <span className="text-primary-600 font-medium">Gemini 3 Flash</span>.
           </div>
 
           {/* CTA */}
@@ -224,7 +238,7 @@ export default function EcoAssistantPage() {
             href="/contact"
             className="inline-flex items-center gap-2 text-sm font-semibold text-primary-600 hover:text-primary-700 transition-colors"
           >
-            Vuoi integrare un AI reale?
+            Vuoi partecipare alle iniziative?
             <ArrowRight size={14} strokeWidth={2.5} />
           </a>
         </aside>
