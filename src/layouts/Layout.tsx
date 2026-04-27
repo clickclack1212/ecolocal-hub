@@ -1,7 +1,7 @@
 import { Outlet } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-import ChatbotButton from '../components/ChatbotButton';
+// import ChatbotButton from '../components/ChatbotButton'; // disabilitato — widget Voiceflow attivo
 
 export default function Layout() {
   return (
