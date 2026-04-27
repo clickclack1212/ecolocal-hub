@@ -25,7 +25,7 @@ export default function Footer() {
               Connettere le comunità con le iniziative di sostenibilità locale.
               Insieme costruiamo un futuro più verde.
             </p>
-            <p className="text-xs text-gray-600 mt-4">Progetto LUMSA · Torino, Italia</p>
+            <p className="text-xs text-gray-600 mt-4">Progetto LUMSA · Palermo, Italia</p>
           </div>
 
           {/* Esplora */}
@@ -78,7 +78,7 @@ export default function Footer() {
         {/* Bottom bar */}
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-gray-600">
           <span>© 2026 EcoLocal Hub — Progetto universitario LUMSA</span>
-          <span>Fatto con 🌿 a Torino</span>
+          <span>Fatto con 🌿 a Palermo</span>
         </div>
       </div>
     </footer>

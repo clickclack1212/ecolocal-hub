@@ -22,13 +22,13 @@ const suggestions = [
 function getMockResponse(input: string): string {
   const q = input.toLowerCase();
   if (q.includes('spreco') || q.includes('rifiut') || q.includes('waste'))
-    return '🌿 Ottima domanda! Per ridurre gli sprechi alimentari: pianifica i pasti settimanalmente, conserva correttamente i prodotti, fai il compostaggio. Controlla anche il Mercato a Rifiuti Zero in Piazza Repubblica ogni primo sabato del mese!';
+    return '🌿 Ottima domanda! Per ridurre gli sprechi alimentari: pianifica i pasti settimanalmente, conserva correttamente i prodotti, fai il compostaggio. Controlla anche il Mercato a Rifiuti Zero in Piazza Politeama ogni primo sabato del mese!';
   if (q.includes('solare') || q.includes('energia') || q.includes('solar'))
-    return "⚡ La Cooperativa SolarShare a Barriera di Milano permette a inquilini e proprietari di investire nel solare condiviso. Evitano 45 tonnellate di CO₂ all'anno!";
+    return "⚡ La Cooperativa SolarShare al Quartiere Noce permette a inquilini e proprietari di investire nel solare condiviso. Evitano 45 tonnellate di CO₂ all'anno!";
   if (q.includes('bici') || q.includes('trasport') || q.includes('mobilit'))
     return '🚲 La Rete GreenWheels conta 200 bici su 15 stazioni in città. Sostituisce 1.200 tragitti in auto al mese. La tessera annuale è conveniente!';
   if (q.includes('orto') || q.includes('cibo') || q.includes('semi') || q.includes('garden'))
-    return "🥕 L'Orto Comunitario Riverside (2.000 mq, 80+ appezzamenti) e la Biblioteca dei Semi alla biblioteca centrale sono perfetti per te!";
+    return "🥕 L'Orto Comunitario (2.000 mq, 80+ appezzamenti) al Quartiere Zisa e la Biblioteca dei Semi alla Biblioteca Comunale sono perfetti per te!";
   if (q.includes('ciao') || q.includes('salve') || q.includes('buon'))
     return '👋 Ciao! Sono l\'Eco Assistente. Chiedimi qualsiasi cosa sulle iniziative di sostenibilità locali!';
   return `🌍 Grazie per la tua domanda su "${input}". Sfoglia la pagina Iniziative per dettagli aggiornati. Presto sarà integrata un'AI reale tramite Voiceflow!`;

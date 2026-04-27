@@ -1,0 +1,1340 @@
+================================================================
+  GUIDA DEFINITIVA — ECO ASSISTENTE CON VOICEFLOW
+  EcoLocal Hub · Progetto LUMSA · Palermo
+  Versione completa: setup, flusso, prompt, knowledge, codice
+================================================================
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  INDICE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  1. Creare il progetto su Voiceflow
+  2. Architettura completa del flusso
+  3. Blocchi — testi pronti da copiare
+  4. System Prompt completo (AI Step)
+  5. Knowledge Base — testo completo pronto all'upload
+  6. Variabili di sessione
+  7. NLU — intenti con frasi di training
+  8. Integrare il widget nel sito (index.html)
+  9. Collegare la pagina /eco-assistant all'API reale
+  10. Personalizzare il widget (colori, icona, testi)
+  11. Test e debug
+  12. Checklist finale
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  1. CREARE IL PROGETTO SU VOICEFLOW
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. Vai su https://creator.voiceflow.com
+   Crea un account gratuito (o accedi con Google).
+
+2. Dashboard → clicca "+ New Project"
+   ┌─────────────────────────────┐
+   │  Platform  →  Chat          │
+   │  Language  →  Italian       │
+   │  Name      →  Eco Assistente — EcoLocal Hub  │
+   └─────────────────────────────┘
+   Clicca "Create Project".
+
+3. Si apre il CANVAS (area di lavoro).
+   A sinistra c'è la barra dei blocchi.
+   I blocchi si trascinano sul canvas e si collegano
+   con frecce.
+
+4. Impostazioni iniziali del progetto:
+   Clicca sull'icona ingranaggio (Settings) in basso a sinistra.
+   - Default Language: Italian
+   - NLU: Voiceflow NLU (default, gratuito)
+   - AI Model: Claude 3 Haiku o GPT-4o-mini (vedi Parte 4)
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  2. ARCHITETTURA COMPLETA DEL FLUSSO
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Struttura visiva del canvas (riproduci esattamente questa):
+
+  ┌─────────┐
+  │  START  │
+  └────┬────┘
+       │
+       ▼
+  ┌─────────────────────┐
+  │  F0 — Benvenuto     │  (Speak)
+  │  + chiedi il nome   │  (Capture)
+  └────────┬────────────┘
+           │
+           ▼
+  ┌─────────────────────────────────────────────────────┐
+  │  F1 — Menu Principale  (Choice — 6 pulsanti)        │
+  └──┬──────┬──────┬──────┬──────┬──────┬──────────────┘
+     │      │      │      │      │      │
+     ▼      ▼      ▼      ▼      ▼      ▼
+   [F2]   [F3]   [F4]   [F5]   [F6]   [F7]
+  Riciclo Cibo  Energia Mobilità Part. Libera→AI
+     │      │      │      │      │      │
+     └──────┴──────┴──────┴──────┴──┬───┘
+                                    │
+                                    ▼
+                          ┌─────────────────┐
+                          │  F8 — Continui? │  (Choice)
+                          └────┬────────────┘
+                               │
+                   ┌───────────┴───────────┐
+                   ▼                       ▼
+             torna a F1            ┌───────────────┐
+                                   │  F9 — Ciao!   │  (Speak + Card)
+                                   └───────────────┘
+                                          │
+                                          ▼
+                                       [END]
+
+  NOTA: ogni blocco F2-F6 ha anche sub-scelte che portano
+  a blocchi di dettaglio, poi rientrano in F8.
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  3. BLOCCHI — TESTI PRONTI DA COPIARE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Copia ogni testo nel relativo blocco Voiceflow.
+Le variabili tra {parentesi graffe} vengono sostituite
+automaticamente dal sistema.
+
+────────────────────────────────────────────────────────────
+F0 — BENVENUTO  (blocco: Speak → poi Capture)
+────────────────────────────────────────────────────────────
+
+SPEAK — Messaggio iniziale:
+"""
+🌿 Ciao! Sono l'Eco Assistente di EcoLocal Hub.
+Ti aiuto a scoprire le iniziative sostenibili a Palermo
+e a capire come vivere in modo più verde ogni giorno.
+
+Prima di iniziare... come ti chiami?
+"""
+
+CAPTURE — Salva il nome:
+  Variable da salvare: {user_name}
+  Tipo: Text
+  Domanda (opzionale): "Scrivi il tuo nome"
+
+SPEAK — Risposta con nome:
+"""
+Benvenuto/a, {user_name}! 🙌
+Cosa vuoi scoprire oggi?
+"""
+
+────────────────────────────────────────────────────────────
+F1 — MENU PRINCIPALE  (blocco: Choice)
+────────────────────────────────────────────────────────────
+
+Testo sopra i pulsanti:
+"""
+Scegli un argomento oppure scrivimi direttamente la tua domanda:
+"""
+
+Pulsanti (aggiungili nell'ordine):
+  1. ♻️  Riciclo e rifiuti zero
+  2. 🥕  Orti e cibo locale
+  3. ⚡  Energia rinnovabile
+  4. 🚲  Mobilità verde
+  5. 🤝  Come partecipare
+  6. 💬  Fai una domanda libera
+
+────────────────────────────────────────────────────────────
+F2 — RICICLO E RIFIUTI ZERO  (blocco: Speak → Choice)
+────────────────────────────────────────────────────────────
+
+SPEAK:
+"""
+♻️ A Palermo ci sono due iniziative attive su riciclo e rifiuti:
+
+📍 Mercato a Rifiuti Zero — Piazza Politeama
+Ogni primo sabato del mese, oltre 40 espositori
+propongono prodotti sfusi e a km zero.
+Gli acquirenti portano i propri contenitori.
+C'è anche un repair café sul posto!
+📧 zerowaste.market@example.com
+
+📍 Fix It! Repair Café — Ballarò
+Ogni giovedì sera al Circolo ARCI.
+Volontari qualificati riparano gratis elettronica,
+vestiti, bici e oggetti di casa.
+📧 fixit@example.com
+
+Su quale vuoi sapere di più?
+"""
+
+CHOICE dopo:
+  A. Mercato Rifiuti Zero — orari e dettagli
+  B. Fix It! Repair Café — come funziona
+  C. ← Torna al menu
+
+  → A porta a F2a (dettaglio Mercato)
+  → B porta a F2b (dettaglio Repair Café)
+  → C torna a F1
+
+F2a — DETTAGLIO MERCATO:
+"""
+🛒 Mercato a Rifiuti Zero — tutto quello che devi sapere:
+
+📅 Quando: ogni primo sabato del mese, ore 9:00–14:00
+📍 Dove: Piazza Politeama, Palermo centro
+💰 Costo: ingresso gratuito
+🛍️ Porta con te: borse di tela, barattoli di vetro,
+   contenitori riutilizzabili
+🔧 Repair café: gratis, porta l'oggetto da riparare
+📊 Impatto: 500 kg di plastica evitata per evento
+
+Vuoi sapere come diventare espositore? Scrivi a:
+zerowaste.market@example.com
+"""
+
+F2b — DETTAGLIO REPAIR CAFÉ:
+"""
+🔧 Fix It! Repair Café — guida pratica:
+
+📅 Quando: ogni giovedì, ore 18:30–21:00
+📍 Dove: Circolo ARCI, Ballarò, Palermo
+💰 Costo: gratuito (donazioni benvenute)
+🛠️ Cosa portano: elettronica, abiti, biciclette,
+   mobili piccoli, giocattoli
+👥 Chi ripara: volontari qualificati (elettricisti,
+   sarte, falegnami, meccanici)
+📊 Impatto: 150 oggetti riparati ogni mese
+
+Non riesci a portare l'oggetto? Scrivici:
+fixit@example.com
+"""
+
+────────────────────────────────────────────────────────────
+F3 — CIBO LOCALE E ORTI  (blocco: Speak → Choice)
+────────────────────────────────────────────────────────────
+
+SPEAK:
+"""
+🥕 Vuoi coltivare o comprare cibo locale a Palermo?
+Ecco le due iniziative principali:
+
+📍 Orto Comunitario — Quartiere Zisa
+Un orto condiviso di 2.000 mq con 80+ appezzamenti.
+I membri coltivano insieme, condividono semi e attrezzi.
+I prodotti in eccesso vanno al banco alimentare.
+📧 garden@riverside-pa.it
+
+📍 Biblioteca dei Semi Aperti — Biblioteca Comunale
+Più di 200 varietà di semi antichi da prendere in prestito
+gratuitamente con la tessera biblioteca.
+A fine stagione restituisci il doppio dei semi.
+📧 seeds@biblioPa.example.com
+
+Vuoi dettagli su uno dei due?
+"""
+
+CHOICE dopo:
+  A. Orto Comunitario — come iscriversi
+  B. Biblioteca dei Semi — come funziona
+  C. ← Torna al menu
+
+F3a — DETTAGLIO ORTO:
+"""
+🌱 Orto Comunitario Zisa — tutte le info:
+
+📍 Dove: Quartiere Zisa, Palermo
+📐 Dimensioni: 2.000 mq · 80+ appezzamenti individuali
+💰 Come iscriversi: contatta garden@riverside-pa.it
+   o presentati il sabato mattina
+🗓️ Attività: laboratori settimanali su compostaggio,
+   risparmio idrico, lotta biologica ai parassiti
+🤝 Community: semi condivisi, attrezzi collettivi,
+   scambio di prodotti tra soci
+🎁 Solidarietà: prodotti in eccesso al banco
+   alimentare ogni venerdì
+📊 Impatto: 800 kg di prodotti coltivati per stagione
+
+Prima visita gratuita — presentati e valuta!
+"""
+
+F3b — DETTAGLIO SEMI:
+"""
+🌾 Biblioteca dei Semi Aperti:
+
+📍 Dove: Biblioteca Comunale di Palermo
+🎫 Accesso: tessera biblioteca (gratuita)
+🌿 Varietà: 200+ semi antichi e a impollinazione aperta
+   (pomodori, zucchine, basilico, erbe aromatiche e altro)
+📋 Come funziona:
+   1. Prenota i semi alla biblioteca
+   2. Coltivi a casa o sull'orto
+   3. A fine stagione restituisci il doppio dei semi
+🌍 Perché conta: preserva biodiversità e varietà locali
+   a rischio di estinzione
+📧 Contatto: seeds@biblioPa.example.com
+"""
+
+────────────────────────────────────────────────────────────
+F4 — ENERGIA RINNOVABILE  (blocco: Speak → Choice)
+────────────────────────────────────────────────────────────
+
+SPEAK:
+"""
+⚡ Energia solare accessibile a tutti, anche in affitto:
+
+📍 Cooperativa SolarShare — Quartiere Noce
+Puoi acquistare quote di un impianto solare condiviso
+anche se sei in affitto o non puoi installare pannelli privati.
+I ritorni arrivano come crediti sulla tua bolletta energetica.
+
+📊 Attualmente:
+   • 60 famiglie alimentate
+   • 45 tonnellate di CO₂ evitate all'anno
+   • Espansione verso un secondo sito in corso
+
+📧 info@solarshare.example.com
+🌐 solarshare.example.com
+
+Vuoi sapere come entrare?
+"""
+
+CHOICE dopo:
+  A. Come acquistare una quota
+  B. Quanto costa e cosa guadagno
+  C. ← Torna al menu
+
+F4a — DETTAGLIO QUOTE:
+"""
+🔋 Come entrare in SolarShare:
+
+1️⃣ CONTATTA la cooperativa: info@solarshare.example.com
+2️⃣ RICHIEDI il modulo di adesione
+3️⃣ SCEGLI quante quote acquistare
+   (ogni quota corrisponde a una porzione dell'impianto)
+4️⃣ FIRMA il contratto cooperativo
+5️⃣ INIZIA a ricevere crediti in bolletta ogni mese
+
+✅ Aperto a: inquilini, proprietari, famiglie,
+   piccole imprese
+✅ Minimo investimento: informati su solarshare.example.com
+✅ Uscita: puoi cedere le quote in qualsiasi momento
+"""
+
+F4b — DETTAGLIO COSTI/GUADAGNI:
+"""
+💰 SolarShare — costi e benefici:
+
+📈 Come funziona il ritorno:
+   I crediti vengono calcolati in proporzione alla
+   quantità di energia prodotta dall'impianto e
+   scalati direttamente dalla tua bolletta.
+
+🌞 Palermo ha circa 2.600 ore di sole l'anno
+   → uno dei migliori rendimenti solari in Italia
+
+📊 Impatto medio per quota:
+   Riduci le emissioni di CO₂ e la bolletta
+   senza installare nulla in casa tua.
+
+Per simulare il tuo risparmio scrivici:
+info@solarshare.example.com
+"""
+
+────────────────────────────────────────────────────────────
+F5 — MOBILITÀ VERDE  (blocco: Speak → Choice)
+────────────────────────────────────────────────────────────
+
+SPEAK:
+"""
+🚲 Muoviti a Palermo in modo sostenibile:
+
+📍 Rete GreenWheels — Bike Sharing Comunitario
+200 biciclette su 15 stazioni distribuite in tutta la città.
+Gestita come cooperativa nata da un progetto universitario.
+
+📊 Impatto: sostituisce 1.200 tragitti in auto ogni mese
+💳 Accesso: tessera annuale o noleggio a ore
+🔧 Manutenzione: meccanici volontari (puoi unirti!)
+📧 info@greenwheels.example.com
+
+Cosa vuoi sapere?
+"""
+
+CHOICE dopo:
+  A. Dove sono le stazioni
+  B. Prezzi e tessera
+  C. Diventare meccanico volontario
+  D. ← Torna al menu
+
+F5a — STAZIONI:
+"""
+📍 Le 15 stazioni GreenWheels a Palermo:
+
+Zona centro: Piazza Politeama, Via Maqueda,
+             Piazza Castelnuovo, Stazione Centrale
+Zona nord:   Viale della Libertà, Mondello
+Zona est:    Oreto, ZEN
+Zona ovest:  Zisa, Noce, Ballarò, Calatafimi
+Zona porto:  Cala, Foro Italico, Acquasanta
+
+Mappa interattiva completa su:
+info@greenwheels.example.com — chiedi il link aggiornato
+"""
+
+F5b — PREZZI:
+"""
+💳 GreenWheels — tariffe:
+
+🗓️ Tessera annuale: conveniente per uso regolare
+   → accesso illimitato, bici riservata per soci
+⏱️ Noleggio a ore: per chi usa la bici saltuariamente
+   → disponibile senza tessera
+
+Per i prezzi aggiornati contatta:
+info@greenwheels.example.com
+(i prezzi possono variare ogni stagione)
+"""
+
+F5c — VOLONTARIO:
+"""
+🔧 Diventare meccanico volontario GreenWheels:
+
+Non serve essere esperti! GreenWheels organizza
+corsi di manutenzione base gratuiti per i volontari.
+
+Come iscriverti:
+📧 Scrivi a info@greenwheels.example.com
+   con oggetto "Voglio fare il volontario"
+
+Cosa fanno i volontari:
+• Controllo freni e gomme ogni settimana
+• Piccole riparazioni nelle stazioni
+• Segnalazione bici danneggiate tramite app
+
+⏰ Impegno: 2-4 ore al mese, flessibile
+"""
+
+────────────────────────────────────────────────────────────
+F6 — COME PARTECIPARE  (blocco: Speak → Choice)
+────────────────────────────────────────────────────────────
+
+SPEAK:
+"""
+🤝 Puoi unirti a EcoLocal Hub in 3 modi:
+
+1️⃣ ESPLORA
+   Vai su /initiatives e sfoglia le 6 iniziative attive.
+   Filtra per categoria (riciclo, cibo, energia...)
+   o cerca per quartiere.
+
+2️⃣ PARTECIPA
+   Compila il modulo su /contact.
+   Ti mettiamo in contatto diretto con i responsabili
+   dell'iniziativa che ti interessa.
+
+3️⃣ PROPONI
+   Hai una tua idea sostenibile per Palermo?
+   Scrivici: g.capuana@lumsastud.it
+   Ti aiutiamo a strutturarla e promuoverla.
+
+Cosa si adatta di più a te?
+"""
+
+CHOICE dopo:
+  A. Voglio esplorare le iniziative → link /initiatives
+  B. Voglio compilare il modulo → link /contact
+  C. Voglio proporre un'idea → mostra email
+  D. ← Torna al menu
+
+────────────────────────────────────────────────────────────
+F7 — DOMANDA LIBERA → AI  (blocco: AI Step)
+────────────────────────────────────────────────────────────
+
+Questo blocco gestisce tutte le domande non coperte
+dai menu. Vedi la Parte 4 per il System Prompt completo.
+
+Prima del blocco AI, aggiungi un Capture per raccogliere
+il testo libero dell'utente se non è già disponibile:
+  Variable: {user_input}
+
+────────────────────────────────────────────────────────────
+F8 — CONTINUARE?  (blocco: Speak → Choice)
+────────────────────────────────────────────────────────────
+
+SPEAK:
+"""
+Posso aiutarti con altro, {user_name}? 😊
+"""
+
+CHOICE:
+  A. "Sì, ho un'altra domanda"  →  torna a F1
+  B. "No, grazie"               →  vai a F9
+
+────────────────────────────────────────────────────────────
+F9 — SALUTO FINALE  (blocco: Speak → Card → End)
+────────────────────────────────────────────────────────────
+
+SPEAK:
+"""
+🌿 Grazie, {user_name}! È stato un piacere.
+Ricorda: ogni piccola azione locale fa la differenza.
+A Palermo il cambiamento parte dai quartieri.
+
+Ci vediamo presto su EcoLocal Hub! 🌱
+"""
+
+CARD (aggiungi dopo lo Speak):
+  Titolo:      Esplora tutte le iniziative
+  Descrizione: 6 progetti attivi a Palermo che aspettano te.
+  Pulsante:    Vai alle Iniziative →
+  URL:         https://tuo-dominio.vercel.app/initiatives
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  4. SYSTEM PROMPT COMPLETO (AI Step — copia tutto)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Questo testo va incollato nel campo "Instructions" del
+blocco "AI Step" su Voiceflow.
+Seleziona il modello: Claude 3 Haiku (veloce, economico)
+oppure GPT-4o-mini (alternativa OpenAI).
+
+════════════════ INIZIO SYSTEM PROMPT ════════════════════
+
+Sei l'Eco Assistente di EcoLocal Hub, una piattaforma
+civica di sostenibilità locale con sede a Palermo, Italia.
+Progetto universitario LUMSA.
+
+## TUO RUOLO
+Aiuti i cittadini di Palermo a:
+- Scoprire e raggiungere le 6 iniziative locali attive
+- Ridurre il loro impatto ambientale con consigli pratici
+- Partecipare come volontari o soci alle iniziative
+- Capire il funzionamento di riciclo, energia solare,
+  mobilità sostenibile, orti urbani, repair economy
+
+## INIZIATIVE CHE CONOSCI (usa SOLO questi dati)
+
+### 1. Orto Comunitario — Quartiere Zisa
+- Tipo: orto urbano condiviso
+- Superficie: 2.000 mq, 80+ appezzamenti individuali
+- Attività: coltivazione collettiva, laboratori settimanali
+  su compostaggio, risparmio idrico, lotta biologica
+- Community: condivisione di semi, attrezzi e prodotti
+- Solidarietà: prodotti in eccesso al banco alimentare
+  ogni venerdì
+- Impatto: 800 kg di prodotti coltivati per stagione
+- Contatto: garden@riverside-pa.it
+- Come iscriversi: contattare via email o presentarsi
+  il sabato mattina
+
+### 2. Rete Ciclistica GreenWheels
+- Tipo: bike sharing comunitario cooperativo
+- Flotta: 200 biciclette
+- Stazioni: 15 punti di prelievo in tutta Palermo
+- Gestione: cooperativa nata da un progetto universitario
+- Accesso: tessera annuale o noleggio a ore
+- Manutenzione: meccanici volontari
+- Impatto: 1.200 tragitti in auto sostituiti al mese
+- Contatto: info@greenwheels.example.com
+
+### 3. Mercato a Rifiuti Zero
+- Tipo: mercato mensile senza plastica monouso
+- Frequenza: ogni primo sabato del mese
+- Luogo: Piazza Politeama, Palermo
+- Orario: 9:00–14:00
+- Espositori: oltre 40, prodotti sfusi e km zero
+- Extra: repair café gratuito sul posto
+- Impatto: 500 kg di plastica evitata per evento
+- Contatto: zerowaste.market@example.com
+
+### 4. Cooperativa Energetica SolarShare
+- Tipo: energia solare condivisa
+- Luogo: Quartiere Noce, Palermo
+- Accesso: acquisto quote dell'impianto, anche per inquilini
+- Ritorno: crediti sulla bolletta energetica
+- Famiglie alimentate: 60 (in espansione)
+- Impatto: 45 tonnellate di CO₂ evitate all'anno
+- Contatto: info@solarshare.example.com
+- Sito: solarshare.example.com
+
+### 5. Fix It! Repair Café
+- Tipo: laboratorio di riparazione gratuito
+- Frequenza: ogni giovedì sera
+- Luogo: Circolo ARCI, Ballarò, Palermo
+- Orario: 18:30–21:00
+- Volontari: elettricisti, sarte, falegnami, meccanici
+- Cosa si ripara: elettronica, vestiti, bici, mobili piccoli
+- Costo: gratuito (donazioni benvenute)
+- Impatto: 150 oggetti riparati ogni mese
+- Contatto: fixit@example.com
+
+### 6. Biblioteca dei Semi Aperti
+- Tipo: banca semi comunitaria
+- Luogo: Biblioteca Comunale di Palermo
+- Accesso: tessera biblioteca (gratuita)
+- Varietà: 200+ semi antichi a impollinazione aperta
+- Come funziona: prendi in prestito, coltivi,
+  restituisci il doppio a fine stagione
+- Missione: preservare biodiversità locale
+- Contatto: seeds@biblioPa.example.com
+
+## CONTATTI DEL PROGETTO
+- Responsabile: Gabriele Capuana
+  Email: g.capuana@lumsastud.it
+- Team: Serena Di Gaudio
+  Email: s.digaudio@lumsastud.it
+- Sito web: [dominio Vercel del progetto]
+- Pagina contatti: /contact
+- Tutte le iniziative: /initiatives
+
+## REGOLE DI COMPORTAMENTO
+
+1. Rispondi SEMPRE in italiano, tono amichevole e diretto.
+2. Sii concreto: dai sempre almeno un'azione pratica
+   (un link, un'email, un orario, un luogo).
+3. Usa emoji con moderazione (1-2 per messaggio).
+4. Mantieni le risposte brevi: massimo 6-8 righe.
+5. NON inventare dati, contatti, prezzi o indirizzi
+   non presenti in questa guida.
+6. Se una domanda esula dalle iniziative, rispondi
+   con consigli generali di sostenibilità e invita
+   a visitare /initiatives per scoprire altro.
+7. Se l'utente sembra frustrato o confuso, semplifica
+   e offri un'opzione diretta ("Vuoi che ti metta
+   in contatto con i responsabili?").
+8. Non menzionare mai concorrenti o altre piattaforme.
+9. L'utente si chiama {user_name} — usalo nella risposta.
+10. Se l'utente menziona un quartiere, personalizza
+    suggerendo l'iniziativa geograficamente più vicina.
+
+## COME RISPONDERE A DOMANDE FREQUENTI
+
+D: "Come posso ridurre i rifiuti a casa?"
+R: Dai 3 consigli pratici + suggerisci il Mercato
+   Rifiuti Zero come passo successivo concreto.
+
+D: "Non ho un giardino, posso coltivare?"
+R: Descrivi l'Orto Comunitario Zisa e la Biblioteca Semi.
+
+D: "La mia bolletta è alta, cosa faccio?"
+R: Spiega SolarShare, anche per chi è in affitto.
+
+D: "Voglio smettere di usare la macchina"
+R: Presenta GreenWheels con stazioni e info tessera.
+
+D: "Ho un oggetto rotto, dove lo porto?"
+R: Fix It! Repair Café, giovedì sera, Ballarò.
+
+D: "Come posso aiutare il progetto?"
+R: Spiega i 3 modi: Esplora, Partecipa, Proponi.
+   Dai il link /contact e le email del team.
+
+════════════════ FINE SYSTEM PROMPT ══════════════════════
+
+MODEL SETTINGS consigliati in Voiceflow:
+  - Temperatura: 0.4 (risposte coerenti, non troppo creative)
+  - Max tokens: 300 (risposte brevi)
+  - Model: Claude 3 Haiku oppure GPT-4o-mini
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  5. KNOWLEDGE BASE — TESTO COMPLETO PER L'UPLOAD
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+La Knowledge Base permette all'AI di rispondere
+citando fonti specifiche invece di "inventare".
+
+COME CARICARLA:
+  In Voiceflow → menu laterale → "KB" (Knowledge Base)
+  → "Add Source" → "Text" → incolla il testo qui sotto
+  → salva con nome: "EcoLocal Hub — Iniziative Palermo"
+
+Poi nel blocco AI Step, abilita l'opzione
+"Use Knowledge Base" e seleziona questa fonte.
+
+════════ INIZIO TESTO KNOWLEDGE BASE (copia tutto) ═══════
+
+# EcoLocal Hub — Guida alle Iniziative di Palermo
+
+EcoLocal Hub è una piattaforma civica che connette i
+cittadini di Palermo con le iniziative di sostenibilità
+locali. Progetto universitario LUMSA, 2024.
+Contatti: g.capuana@lumsastud.it | s.digaudio@lumsastud.it
+
+---
+
+## INIZIATIVA 1: Orto Comunitario — Quartiere Zisa
+
+L'Orto Comunitario si estende su 2.000 mq nel Quartiere
+Zisa di Palermo e ospita oltre 80 appezzamenti individuali.
+I membri condividono attrezzi, semi e competenze. I
+laboratori settimanali trattano il compostaggio, il
+risparmio idrico e la lotta biologica ai parassiti.
+I prodotti in eccesso vengono donati al banco alimentare
+locale ogni venerdì.
+
+Categoria: Cibo Locale
+Luogo: Quartiere Zisa, Palermo
+Impatto: 800 kg di prodotti coltivati localmente per stagione
+Contatto: garden@riverside-pa.it
+Come partecipare: Contattare via email o presentarsi
+di persona il sabato mattina. Prima visita gratuita.
+Tag: agricoltura urbana, comunità, biologico, km zero
+
+---
+
+## INIZIATIVA 2: Rete Ciclistica GreenWheels
+
+GreenWheels gestisce 200 biciclette su 15 stazioni nel
+centro e in periferia di Palermo. L'iniziativa è nata da
+un progetto universitario e ora funziona come cooperativa.
+I soci pagano una quota annuale; gli utenti occasionali
+possono noleggiare a ore. La manutenzione è svolta in
+parte da meccanici volontari.
+
+Stazioni principali: Piazza Politeama, Via Maqueda,
+Piazza Castelnuovo, Stazione Centrale, Viale della Libertà,
+Mondello, Oreto, ZEN, Zisa, Noce, Ballarò, Calatafimi,
+Cala, Foro Italico, Acquasanta.
+
+Categoria: Trasporti
+Luogo: Tutta la città, Palermo
+Impatto: 1.200 tragitti in auto sostituiti al mese
+Contatto: info@greenwheels.example.com
+Come partecipare: Acquistare la tessera annuale o
+noleggiare a ore. Per diventare meccanico volontario
+scrivere all'indirizzo email.
+Tag: ciclismo, basse emissioni, mobilità, cooperativa
+
+---
+
+## INIZIATIVA 3: Mercato a Rifiuti Zero
+
+Il primo sabato di ogni mese in Piazza Politeama, il
+Mercato a Rifiuti Zero riunisce oltre 40 espositori
+impegnati ad eliminare la plastica monouso. Gli acquirenti
+portano i propri contenitori. Il mercato ospita anche un
+"repair café" dove i volontari riparano gratuitamente gli
+oggetti rotti.
+
+Orario: ogni primo sabato del mese, 9:00–14:00
+Cosa portare: borse di tela, barattoli, contenitori
+Come esporre: contattare l'organizzazione via email
+
+Categoria: Riciclo
+Luogo: Piazza Politeama, Palermo
+Impatto: 500 kg di plastica evitata per evento
+Contatto: zerowaste.market@example.com
+Come partecipare: Visitare il mercato come acquirente
+o richiedere uno spazio come espositore via email.
+Tag: zero rifiuti, senza plastica, mercato locale, sfuso
+
+---
+
+## INIZIATIVA 4: Cooperativa Energetica SolarShare
+
+SolarShare permette ai residenti che non possono
+installare pannelli privati — soprattutto gli inquilini —
+di acquistare quote di un impianto solare condiviso.
+I ritorni arrivano come crediti sulla bolletta energetica.
+Il progetto alimenta attualmente 60 famiglie ed è in
+espansione verso un secondo sito nel quartiere.
+I profitti oltre i costi operativi vengono reinvestiti
+nelle infrastrutture verdi locali.
+
+Palermo ha circa 2.600 ore di sole l'anno, tra le
+condizioni migliori d'Italia per il solare.
+
+Categoria: Energia
+Luogo: Quartiere Noce, Palermo
+Impatto: 45 tonnellate di CO₂ evitate all'anno
+Contatto: info@solarshare.example.com
+Sito: solarshare.example.com
+Come partecipare: Contattare via email per ricevere
+il modulo di adesione e acquistare quote.
+Aperto a inquilini, proprietari, famiglie, piccole imprese.
+Tag: solare, rinnovabile, cooperativa, bolletta, energia
+
+---
+
+## INIZIATIVA 5: Fix It! Repair Café
+
+Fix It! si riunisce ogni giovedì sera al Circolo ARCI
+nel quartiere Ballarò. Volontari qualificati (elettricisti,
+sarte, falegnami, meccanici) riparano gratuitamente
+elettronica, vestiti, biciclette e oggetti di casa.
+Si imparano abilità pratiche, l'oggetto riprende vita e
+meno rifiuti finiscono in discarica.
+Le donazioni finanziano la libreria dei ricambi.
+
+Orario: ogni giovedì, 18:30–21:00
+Costo: gratuito (donazioni benvenute)
+Cosa si ripara: smartphone, elettrodomestici,
+abiti e jeans, biciclette, mobili piccoli, giocattoli
+
+Categoria: Riciclo
+Luogo: Circolo ARCI, Ballarò, Palermo
+Impatto: 150 oggetti riparati ogni mese
+Contatto: fixit@example.com
+Come partecipare: Presentarsi direttamente il giovedì
+con l'oggetto da riparare. Per fare il volontario scrivere.
+Tag: riparazione, upcycling, competenze, repair, economia
+
+---
+
+## INIZIATIVA 6: Biblioteca dei Semi Aperti
+
+La Biblioteca dei Semi Aperti opera dalla sede della
+Biblioteca Comunale di Palermo. Conserva oltre 200
+varietà di semi antichi e a impollinazione aperta.
+Chiunque abbia la tessera della biblioteca può prendere
+semi in prestito. Al raccolto, i membri restituiscono il
+doppio dei semi presi, mantenendo la collezione in crescita.
+Preserva la biodiversità e la conoscenza agricola locale.
+
+Varietà disponibili: pomodori antichi, zucchine,
+peperoni locali, basilico siciliano, erbe aromatiche,
+melanzane, fave, ceci, legumi vari e molti altri.
+
+Categoria: Cibo Locale
+Luogo: Biblioteca Comunale, Palermo
+Impatto: 200+ varietà antiche preservate
+Contatto: seeds@biblioPa.example.com
+Come partecipare: Ottenere la tessera gratuita della
+Biblioteca Comunale e recarsi al banco semi.
+Tag: semi, biodiversità, cibo locale, biblioteca, cultura
+
+---
+
+## DOMANDE FREQUENTI
+
+D: Posso partecipare a più iniziative insieme?
+R: Sì, molti membri di EcoLocal Hub partecipano a
+2-3 iniziative. Non c'è limite.
+
+D: Devo pagare per partecipare?
+R: La maggior parte è gratuita. GreenWheels ha una
+tessera annuale. SolarShare richiede l'acquisto di quote.
+Fix It! e il Mercato Rifiuti Zero sono completamente
+gratuiti per chi partecipa come visitatore.
+
+D: Vivo fuori Palermo, posso partecipare?
+R: Il progetto è focalizzato su Palermo. Alcune attività
+come la Biblioteca dei Semi richiedono residenza/tessera.
+Contattaci per valutare caso per caso.
+
+D: Come posso proporre una nuova iniziativa?
+R: Scrivi a g.capuana@lumsastud.it con oggetto
+"Proposta Iniziativa" descrivendo il progetto.
+
+D: Cosa si fa con le donazioni al Repair Café?
+R: Finanziano la libreria dei ricambi (viti, cavi, bottoni,
+cerniere) usata dai volontari durante le riparazioni.
+
+════════ FINE TESTO KNOWLEDGE BASE ═══════════════════════
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  6. VARIABILI DI SESSIONE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+In Voiceflow, crea queste variabili prima di costruire i
+blocchi. Vai su: Variables (icona {x} nel menu laterale).
+
+  Nome            Tipo     Valore default   Dove viene usata
+  ─────────────────────────────────────────────────────────
+  user_name       Text     "Utente"         F0 Capture, tutti
+  user_quarter    Text     ""               F7 AI Step context
+  user_input      Text     ""               F7 Capture libero
+  last_topic      Text     ""               tracking argomento
+  visit_count     Number   0                personalizzazione
+
+Come impostare visit_count:
+  Aggiungi un blocco "Set Variable" all'inizio del flusso:
+  visit_count = {visit_count} + 1
+
+  Se visit_count > 1, modifica il messaggio di benvenuto:
+  "Bentornato/a, {user_name}! Cosa scopriamo oggi?"
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  7. NLU — INTENTI CON FRASI DI TRAINING
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Gli intenti permettono all'AI di capire cosa vuole
+l'utente anche quando non clicca un pulsante.
+
+In Voiceflow: NLU → Intents → "+ New Intent"
+Per ogni intent, aggiungi TUTTE le frasi di esempio.
+
+────────────────────────────────────────────────────────────
+INTENT: saluto
+────────────────────────────────────────────────────────────
+ciao
+salve
+buongiorno
+buonasera
+buonanotte
+hey
+hei
+ciao ciao
+oh ciao
+saluti
+hello
+hi
+
+────────────────────────────────────────────────────────────
+INTENT: riciclo
+────────────────────────────────────────────────────────────
+voglio riciclare meglio
+come posso ridurre i rifiuti
+dove butto la plastica
+mercato rifiuti zero
+repair café
+riparazione
+riparare un oggetto
+voglio riparare qualcosa
+ho un oggetto rotto
+dove si ripara
+upcycling
+zero sprechi
+zero rifiuti
+senza plastica
+differenziata
+dove buttare
+
+────────────────────────────────────────────────────────────
+INTENT: cibo_locale
+────────────────────────────────────────────────────────────
+orto comunitario
+voglio coltivare
+coltivare verdure
+orto urbano
+cibo locale
+km zero
+spreco alimentare
+ridurre gli sprechi alimentari
+semi
+biodiversità
+biblioteca dei semi
+agricoltura urbana
+verdure biologiche
+mercato bio
+prodotti locali
+dove coltivare a palermo
+
+────────────────────────────────────────────────────────────
+INTENT: energia
+────────────────────────────────────────────────────────────
+energia solare
+pannelli solari
+solarshare
+cooperativa solare
+bolletta alta
+risparmio energetico
+energie rinnovabili
+fotovoltaico
+solare condiviso
+posso fare il solare in affitto
+sono in affitto posso fare il solare
+CO2
+ridurre le emissioni
+impianto solare
+
+────────────────────────────────────────────────────────────
+INTENT: mobilita
+────────────────────────────────────────────────────────────
+bicicletta
+bici
+greenwheels
+bike sharing
+mobilità sostenibile
+voglio andare in bici
+smettere di usare la macchina
+auto
+muovermi senza auto
+noleggio bici
+stazioni bici
+dove sono le bici
+tragitti sostenibili
+trasporti ecologici
+
+────────────────────────────────────────────────────────────
+INTENT: partecipare
+────────────────────────────────────────────────────────────
+come partecipo
+voglio partecipare
+come mi iscrivo
+voglio iscrivermi
+come posso aiutare
+fare volontariato
+voglio fare il volontario
+proporre un'iniziativa
+ho un'idea
+contatto
+come vi contatto
+informazioni
+modulo
+iscriviti
+
+────────────────────────────────────────────────────────────
+INTENT: negazione
+────────────────────────────────────────────────────────────
+no grazie
+no
+niente altro
+va bene così
+basta
+ok grazie
+grazie mille
+tutto chiaro
+perfetto grazie
+ho capito
+
+────────────────────────────────────────────────────────────
+INTENT: affermazione
+────────────────────────────────────────────────────────────
+sì
+si
+certo
+ovviamente
+esatto
+ok
+d'accordo
+va bene
+sì grazie
+yep
+sì voglio sapere
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  8. INTEGRARE IL WIDGET NEL SITO (index.html)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+PASSO 1 — Pubblica il flusso su Voiceflow
+  In alto a destra → "Publish" → "Publish to Production"
+  Attendi la conferma "Published successfully".
+
+PASSO 2 — Recupera le credenziali
+  Voiceflow → Integrations (icona puzzle a sinistra)
+  → "Web Chat" → vedrai:
+
+    Project ID:  vf_XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+    API Key:     VF.DM.XXXXXXXX.XXXXXXXXXXXXXXXXXXXXXXXX
+
+  Tienile a portata di mano.
+
+PASSO 3 — Apri index.html nel progetto EcoLocal Hub
+  Trova il commento:
+    <!-- VOICEFLOW CHATBOT SCRIPT -->
+
+  Sostituisci l'intero blocco commentato con questo
+  (inserendo i tuoi valori reali):
+
+┌─────────────────────────────────────────────────────────┐
+│  <!-- VOICEFLOW WIDGET — ECO ASSISTENTE -->              │
+│  <script type="text/javascript">                        │
+│    (function(d, t) {                                    │
+│      var v = d.createElement(t),                        │
+│          s = d.getElementsByTagName(t)[0];              │
+│      v.onload = function() {                            │
+│        window.voiceflow.chat.load({                     │
+│          verify: {                                      │
+│            projectID: 'QUI_IL_TUO_PROJECT_ID'           │
+│          },                                             │
+│          url: 'https://general-runtime.voiceflow.com',  │
+│          versionID: 'production',                       │
+│          launch: {                                      │
+│            event: {                                     │
+│              type: 'launch',                            │
+│              payload: {                                 │
+│                page: window.location.pathname           │
+│              }                                          │
+│            }                                            │
+│          },                                             │
+│          assistant: {                                   │
+│            title:       'Eco Assistente',               │
+│            description: 'Sostenibilità · Palermo',      │
+│            color:       '#16a34a',                      │
+│            icon: 'https://TUO-DOMINIO.vercel.app/logo.png' │
+│          }                                              │
+│        });                                              │
+│      };                                                 │
+│      v.src  = 'https://cdn.voiceflow.com/widget/bundle.mjs'; │
+│      v.type = 'text/javascript';                        │
+│      s.parentNode.insertBefore(v, s);                   │
+│    })(document, 'script');                              │
+│  </script>                                              │
+└─────────────────────────────────────────────────────────┘
+
+  Sostituisci:
+  • QUI_IL_TUO_PROJECT_ID  → il tuo Project ID
+  • TUO-DOMINIO            → il tuo dominio Vercel
+
+PASSO 4 — Disabilita ChatbotButton (evita duplicati)
+  Apri: src/layouts/Layout.tsx
+  Trova: <ChatbotButton />
+  Commentalo così:
+    {/* <ChatbotButton /> */}
+  Voiceflow inserirà automaticamente il suo pulsante.
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  9. COLLEGARE /eco-assistant ALL'API REALE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+La pagina /eco-assistant ora usa getMockResponse().
+Per collegarla a Voiceflow reale, sostituisci
+l'intera funzione getMockResponse in
+src/pages/EcoAssistantPage.tsx con questo codice:
+
+────────────────────────────────────────────────────────────
+CODICE COMPLETO DA SOSTITUIRE
+────────────────────────────────────────────────────────────
+
+// 1. Aggiungi questo import in cima al file:
+import { useRef } from 'react';
+
+// 2. Dentro il componente EcoAssistantPage, prima
+//    degli useState, aggiungi:
+const sessionIdRef = useRef<string>(
+  Math.random().toString(36).slice(2)
+);
+
+// 3. Sostituisci getMockResponse con questa funzione
+//    asincrona (mettila FUORI dal componente):
+
+async function getVoiceflowResponse(
+  userMessage: string,
+  sessionId: string
+): Promise<string> {
+  try {
+    const res = await fetch(
+      `https://general-runtime.voiceflow.com/state/user/${sessionId}/interact`,
+      {
+        method: 'POST',
+        headers: {
+          'Authorization': 'VF.DM.QUI_LA_TUA_API_KEY',
+          'Content-Type': 'application/json',
+          'versionID': 'production',
+        },
+        body: JSON.stringify({
+          action: { type: 'text', payload: userMessage },
+          config: { tts: false, stripSSML: true }
+        }),
+      }
+    );
+    if (!res.ok) throw new Error('Errore API Voiceflow');
+    const traces = await res.json();
+    const testo = traces
+      .filter((t: any) =>
+        t.type === 'speak' || t.type === 'text'
+      )
+      .map((t: any) => t.payload?.message ?? '')
+      .join(' ')
+      .trim();
+    return testo || '🌍 Non ho trovato una risposta specifica. Visita /initiatives per esplorare le iniziative!';
+  } catch {
+    return '⚠️ Connessione temporaneamente non disponibile. Riprova tra poco!';
+  }
+}
+
+// 4. Aggiorna la funzione handleSend per usare
+//    getVoiceflowResponse invece di getMockResponse:
+//
+//    Sostituisci:
+//      setMessages((prev) => [
+//        ...prev,
+//        { role: 'assistant', text: getMockResponse(msg) }
+//      ]);
+//
+//    Con:
+//      const reply = await getVoiceflowResponse(
+//        msg,
+//        sessionIdRef.current
+//      );
+//      setMessages((prev) => [
+//        ...prev,
+//        { role: 'assistant', text: reply }
+//      ]);
+//
+//    E cambia handleSend da funzione normale ad async:
+//      async function handleSend(text?: string) { ... }
+
+────────────────────────────────────────────────────────────
+NOTA SICUREZZA — API KEY
+────────────────────────────────────────────────────────────
+
+NON inserire mai la API Key direttamente nel codice
+che viene pushato su GitHub (è pubblica!).
+
+Invece, usa le variabili d'ambiente di Vite:
+1. Crea un file .env nella root del progetto
+   (è già in .gitignore):
+   VITE_VOICEFLOW_API_KEY=VF.DM.tuachiavereale
+
+2. Nel codice usa:
+   'Authorization': import.meta.env.VITE_VOICEFLOW_API_KEY
+
+3. Su Vercel, aggiungi la variabile nelle impostazioni:
+   Vercel Dashboard → Settings → Environment Variables
+   → VITE_VOICEFLOW_API_KEY → [incolla la key]
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  10. PERSONALIZZARE IL WIDGET
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Dall'interno di Voiceflow puoi cambiare l'aspetto
+del widget senza toccare il codice del sito.
+
+Voiceflow → Integrations → Web Chat → "Customize":
+
+  GENERALE
+  ┌────────────────────────────────────────────┐
+  │ Assistant Name:   Eco Assistente           │
+  │ Description:      Sostenibilità · Palermo  │
+  │ Avatar:           carica logo.png          │
+  └────────────────────────────────────────────┘
+
+  COLORI (usa i colori brand EcoLocal Hub)
+  ┌────────────────────────────────────────────┐
+  │ Primary Color:    #16a34a  (verde brand)   │
+  │ Background:       #ffffff                  │
+  │ Text:             #111827                  │
+  │ User bubble:      #16a34a                  │
+  │ Assistant bubble: #f3f4f6                  │
+  └────────────────────────────────────────────┘
+
+  LAUNCHER (pulsante flottante)
+  ┌────────────────────────────────────────────┐
+  │ Position:         Bottom Right             │
+  │ Label:            "Eco Assistente"         │
+  │ Show label:       On                       │
+  │ Hide on mobile:   Off                      │
+  └────────────────────────────────────────────┘
+
+  FINESTRA CHAT
+  ┌────────────────────────────────────────────┐
+  │ Width:            380px                    │
+  │ Height:           600px                    │
+  │ Border radius:    16px                     │
+  │ Watermark:        disabilita (piano Pro)   │
+  └────────────────────────────────────────────┘
+
+  MESSAGGIO INIZIALE (mostrato prima che l'utente apra)
+  ┌────────────────────────────────────────────┐
+  │ "🌿 Ciao! Come posso aiutarti con la       │
+  │  sostenibilità a Palermo?"                 │
+  └────────────────────────────────────────────┘
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  11. TEST E DEBUG
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+SEQUENZA DI TEST CONSIGLIATA (esegui in ordine):
+
+  Test 1 — Flusso base:
+    ✓ Apri il progetto Voiceflow → clicca "Run"
+    ✓ Scrivi "ciao" → deve rispondere con F0
+    ✓ Digita un nome → deve salvarlo in {user_name}
+    ✓ Clicca "♻️ Riciclo" → deve mostrare F2
+    ✓ Clicca "Torna al menu" → deve tornare a F1
+    ✓ Clicca "No, grazie" in F8 → deve mostrare F9
+
+  Test 2 — AI libera:
+    ✓ Clicca "💬 Fai una domanda libera"
+    ✓ Scrivi: "Come faccio il compostaggio a casa?"
+    ✓ Verifica che la risposta sia in italiano
+    ✓ Verifica che menzioni iniziative reali di Palermo
+    ✓ Scrivi: "What time does the market open?"
+    ✓ Verifica che risponda in italiano comunque
+
+  Test 3 — Edge cases:
+    ✓ Scrivi qualcosa di irrilevante ("mi piace la pizza")
+    ✓ Verifica che indirizzi gentilmente alle iniziative
+    ✓ Scrivi un quartiere di Palermo ("abito alla Zisa")
+    ✓ Verifica che risponda con l'iniziativa più vicina
+
+  Test 4 — Widget sul sito:
+    ✓ Avvia: npm run dev
+    ✓ Apri http://localhost:5173
+    ✓ Il pulsante verde appare in basso a destra
+    ✓ Clicca → si apre la chat con header verde
+    ✓ Naviga su /contact → il widget è ancora presente
+    ✓ Naviga su /eco-assistant → la pagina risponde
+
+PROBLEMI COMUNI E SOLUZIONI:
+
+  ❌ Widget non appare sul sito
+  ✅ Controlla che il Project ID in index.html sia corretto
+  ✅ Assicurati di aver cliccato "Publish" su Voiceflow
+  ✅ Apri i DevTools → Console → cerca errori
+
+  ❌ Il chatbot risponde in inglese
+  ✅ Verifica che il System Prompt inizi con
+     "Rispondi SEMPRE in italiano"
+  ✅ Controlla che il progetto sia impostato su Italian
+
+  ❌ Il nome utente non viene salvato
+  ✅ Verifica che il blocco Capture usi la variabile
+     {user_name} (non una nuova variabile con altro nome)
+
+  ❌ L'AI inventa dati falsi
+  ✅ Abbassa la Temperatura a 0.2-0.3 nel blocco AI Step
+  ✅ Aggiungi nel prompt: "Non inventare mai dati"
+  ✅ Carica la Knowledge Base (Parte 5)
+
+  ❌ Errore 401 nella chiamata API da EcoAssistantPage
+  ✅ Verifica che la API Key sia corretta e non scaduta
+  ✅ Controlla che sia VITE_ il prefisso della env var
+
+  ❌ Risposte troppo lunghe
+  ✅ Riduci Max Tokens a 200 nel blocco AI Step
+  ✅ Aggiungi al prompt: "Massimo 5 righe per risposta"
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  12. CHECKLIST FINALE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+SU VOICEFLOW (creator.voiceflow.com):
+  [ ] Account creato, progetto "Eco Assistente" in italiano
+  [ ] Variabili create: user_name, user_quarter,
+      user_input, last_topic, visit_count
+  [ ] Blocco F0: Speak benvenuto + Capture nome
+  [ ] Blocco F1: Choice con 6 pulsanti
+  [ ] Blocchi F2–F6: percorsi tematici con sub-scelte
+  [ ] Blocco F7: AI Step con System Prompt completo
+      (temperatura 0.4, max tokens 300)
+  [ ] Knowledge Base caricata (testo Parte 5)
+  [ ] Knowledge Base abilitata nel blocco AI Step
+  [ ] Blocco F8: Choice "Continui?"
+  [ ] Blocco F9: Speak finale + Card con link
+  [ ] Tutti i blocchi collegati senza frecce interrotte
+  [ ] NLU: 8 intenti con frasi di training aggiunti
+  [ ] Widget personalizzato: colore #16a34a, titolo ok
+  [ ] Test completo con "Run" — tutti i percorsi testati
+  [ ] Clicca "Publish" → Production
+
+SUL SITO (EcoLocal Hub):
+  [ ] Project ID copiato da Voiceflow Integrations
+  [ ] API Key copiata da Voiceflow Integrations
+  [ ] File .env creato con VITE_VOICEFLOW_API_KEY
+  [ ] index.html aggiornato con lo script widget
+  [ ] ChatbotButton commentato in Layout.tsx
+  [ ] EcoAssistantPage.tsx aggiornato con API reale
+  [ ] API Key usa import.meta.env (non hardcoded)
+  [ ] Test su localhost:5173 — widget appare e funziona
+  [ ] Test su /eco-assistant — risposte reali da Voiceflow
+  [ ] .env aggiunto a .gitignore (verificare!)
+  [ ] VITE_VOICEFLOW_API_KEY aggiunta su Vercel Dashboard
+  [ ] Deploy su Vercel → test in produzione
+
+================================================================
+  Fine guida — Eco Assistente con Voiceflow
+  EcoLocal Hub · LUMSA · Palermo
+================================================================

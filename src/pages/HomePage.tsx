@@ -34,7 +34,7 @@ const features = [
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
         <div className="p-4 border-b border-gray-50 flex items-center gap-2">
           <div className="w-2 h-2 rounded-full bg-primary-400" />
-          <span className="text-xs text-gray-400 font-medium">Iniziative · Torino</span>
+          <span className="text-xs text-gray-400 font-medium">Iniziative · Palermo</span>
         </div>
         <div className="p-4 space-y-2.5">
           {[
@@ -146,7 +146,7 @@ const valuePropCards = [
   {
     icon: Users,
     title: 'Comunità attiva',
-    desc: 'Oltre 800 persone già coinvolte in iniziative nella città di Torino.',
+    desc: 'Oltre 800 persone già coinvolte in iniziative nella città di Palermo.',
   },
   {
     icon: TrendingUp,
@@ -300,7 +300,7 @@ export default function HomePage() {
           {/* Badge */}
           <div className="inline-flex items-center gap-2 bg-white/15 backdrop-blur-sm border border-white/20 text-white text-xs font-semibold px-4 py-1.5 rounded-full mb-8">
             <span className="w-1.5 h-1.5 rounded-full bg-green-400" />
-            Piattaforma di sostenibilità locale · Torino
+            Piattaforma di sostenibilità locale · Palermo
           </div>
 
           {/* Heading */}
@@ -335,7 +335,7 @@ export default function HomePage() {
 
           {/* Trust line */}
           <p className="mt-10 text-sm text-white/50">
-            Progetto LUMSA · 800+ persone già coinvolte · Torino, Italia
+            Progetto LUMSA · 800+ persone già coinvolte · Palermo, Italia
           </p>
         </div>
       </section>

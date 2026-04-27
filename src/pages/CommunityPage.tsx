@@ -125,7 +125,7 @@ export default function CommunityPage() {
                 { v: '6+', l: 'Progetti attivi' },
                 { v: '800+', l: 'Membri' },
                 { v: '2024', l: 'Anno di fondazione' },
-                { v: 'Torino', l: 'Città pilota' },
+                { v: 'Palermo', l: 'Città pilota' },
               ].map((s) => (
                 <div key={s.l} className="bg-white rounded-xl p-5 border border-gray-100">
                   <div className="text-2xl font-extrabold text-primary-700">{s.v}</div>

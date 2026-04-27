@@ -1,4 +1,12 @@
-import { Mail, MapPin, Clock, ArrowRight } from 'lucide-react';
+import { useEffect } from 'react';
+import { Mail, MapPin, Clock } from 'lucide-react';
+
+// Tally global tipizzato
+declare global {
+  interface Window {
+    Tally?: { loadEmbeds: () => void };
+  }
+}
 
 const howToJoin = [
   {
@@ -26,11 +34,28 @@ const howToJoin = [
 const contactInfo = [
   { Icon: Mail, label: 'g.capuana@lumsastud.it', href: 'mailto:g.capuana@lumsastud.it' },
   { Icon: Mail, label: 's.digaudio@lumsastud.it', href: 'mailto:s.digaudio@lumsastud.it' },
-  { Icon: MapPin, label: 'Roma, Italia (disponibili da remoto)', href: null },
+  { Icon: MapPin, label: 'Palermo, Italia (disponibili da remoto)', href: null },
   { Icon: Clock, label: 'Risposta entro 2 giorni lavorativi', href: null },
 ];
 
 export default function ContactPage() {
+  // Tally viene eseguito prima che React monti l'iframe nel DOM:
+  // richiamiamo loadEmbeds() manualmente dopo il mount.
+  useEffect(() => {
+    if (window.Tally) {
+      window.Tally.loadEmbeds();
+    } else {
+      // Fallback: se lo script non è ancora pronto, aspettiamo l'evento
+      const onLoad = () => window.Tally?.loadEmbeds();
+      document.querySelector('script[src*="tally.so"]')
+        ?.addEventListener('load', onLoad);
+      return () => {
+        document.querySelector('script[src*="tally.so"]')
+          ?.removeEventListener('load', onLoad);
+      };
+    }
+  }, []);
+
   return (
     <>
       {/* ── HERO ── */}
@@ -101,57 +126,27 @@ export default function ContactPage() {
             <div className="px-6 py-5 border-b border-gray-100 flex items-center justify-between">
               <div>
                 <h2 className="text-base font-semibold text-gray-900">Iscriviti e contattaci</h2>
-                <p className="text-xs text-gray-400 mt-0.5">Tally.so embed — pronti per l'integrazione</p>
+                <p className="text-xs text-gray-400 mt-0.5">Compila il modulo — ti risponderemo entro 2 giorni</p>
               </div>
               <div className="flex items-center gap-1.5 text-xs font-medium text-primary-600 bg-primary-50 px-2.5 py-1 rounded-full border border-primary-100">
-                <div className="w-1.5 h-1.5 rounded-full bg-primary-500" />
+                <div className="w-1.5 h-1.5 rounded-full bg-primary-500 animate-pulse" />
                 Attivo
               </div>
             </div>
 
-            {/*
-             * PLACEHOLDER TALLY.SO
-             * Sostituisci questo div con il tuo iframe Tally:
-             *
-             * <iframe
-             *   data-tally-src="https://tally.so/embed/YOUR_FORM_ID?alignLeft=1&hideTitle=1&transparentBackground=1"
-             *   loading="lazy"
-             *   width="100%"
-             *   height="520"
-             *   frameBorder="0"
-             *   title="EcoLocal Hub - Modulo Partecipazione"
-             * />
-             *
-             * Aggiungi anche: <script async src="https://tally.so/widgets/embed.js" /> in index.html
-             */}
-            <div
-              id="tally-embed-container"
-              className="min-h-[420px] flex flex-col items-center justify-center p-10 text-center bg-gray-50/50"
-              aria-label="Placeholder modulo di contatto"
-            >
-              <div className="w-16 h-16 rounded-2xl bg-white border border-gray-200 flex items-center justify-center mx-auto mb-5 text-2xl shadow-sm">
-                📋
-              </div>
-              <p className="text-base font-semibold text-gray-700 mb-2">
-                Modulo in arrivo
-              </p>
-              <p className="text-sm text-gray-400 leading-relaxed max-w-xs">
-                Quest'area è pronta per un modulo{' '}
-                <strong className="text-gray-600">Tally.so</strong>.
-                Crea il tuo form e incolla l'iframe qui.
-              </p>
-              <div className="mt-6 bg-gray-100 text-gray-400 text-xs px-4 py-2.5 rounded-lg font-mono">
-                &lt;iframe data-tally-src="…" /&gt;
-              </div>
-
-              {/* Fallback mailto CTA */}
-              <a
-                href="mailto:g.capuana@lumsastud.it"
-                className="mt-8 inline-flex items-center gap-2 text-sm font-semibold text-primary-600 hover:text-primary-700 transition-colors"
-              >
-                Scrivici via email
-                <ArrowRight size={14} strokeWidth={2.5} />
-              </a>
+            {/* Tally.so embed — Form ID: Pd2rrb */}
+            <div id="tally-embed-container" className="px-2 py-2">
+              <iframe
+                data-tally-src="https://tally.so/embed/Pd2rrb?alignLeft=1&hideTitle=1&transparentBackground=1&dynamicHeight=1"
+                loading="lazy"
+                width="100%"
+                height="540"
+                frameBorder={0}
+                marginHeight={0}
+                marginWidth={0}
+                title="EcoLocal Hub — Modulo Partecipazione"
+                className="w-full"
+              />
             </div>
           </div>
         </div>
